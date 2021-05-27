@@ -10,11 +10,19 @@
 import XMonad
 import Data.Monoid
 import System.Exit
+
 import XMonad.Util.Run
 import XMonad.Util.SpawnOnce
+
 import XMonad.Hooks.ManageDocks
 import XMonad.Hooks.DynamicLog
+
 import XMonad.Actions.WindowBringer
+import XMonad.Actions.CycleWS
+
+import XMonad.Layout.Spacing
+import XMonad.Layout.ThreeColumns
+import XMonad.Layout.MultiColumns
 
 import qualified XMonad.StackSet as W
 import qualified Data.Map        as M
@@ -52,7 +60,7 @@ myModMask       = mod4Mask
 --
 -- > workspaces = ["web", "irc", "code" ] ++ map show [4..9]
 --
-myWorkspaces    = ["1","2","3","4","5","6","7","8","9"]
+myWorkspaces    = ["1","2","3","4","5"]
 
 -- Border colors for unfocused and focused windows, respectively.
 --
@@ -149,7 +157,18 @@ myKeys conf@(XConfig {XMonad.modMask = modm}) = M.fromList $
         | (i, k) <- zip (XMonad.workspaces conf) [xK_1 .. xK_9]
         , (f, m) <- [(W.greedyView, 0), (W.shift, shiftMask)]]
     ++
-
+      [((modm,               xK_Right),  nextWS)
+  , ((modm,               xK_Left),    prevWS)
+--  , ((modm .|. shiftMask, xK_Down),  shiftToNext)
+--  , ((modm .|. shiftMask, xK_Up),    shiftToPrev)
+    , ((modm .|. shiftMask, xK_Right), shiftToNext >> nextWS)
+  , ((modm .|. shiftMask, xK_Left),   shiftToPrev >> prevWS)
+--  , ((modm,               xK_Right), nextScreen)
+--  , ((modm,               xK_Left),  prevScreen)
+--  , ((modm .|. shiftMask, xK_Right), shiftNextScreen)
+--  , ((modm .|. shiftMask, xK_Left),  shiftPrevScreen)
+  , ((modm,               xK_z),     toggleWS)]
+    ++
     --
     -- mod-{w,e,r}, Switch to physical/Xinerama screens 1, 2, or 3
     -- mod-shift-{w,e,r}, Move client to screen 1, 2, or 3
@@ -189,7 +208,10 @@ myMouseBindings (XConfig {XMonad.modMask = modm}) = M.fromList $
 -- The available layouts.  Note that each layout is separated by |||,
 -- which denotes layout choice.
 --
-myLayout = avoidStruts (tiled ||| Mirror tiled ||| Full)
+windowBorderWidth = 5
+multiColLayout = Mirror (multiCol [6] 6 0.01 (-0.5))
+
+myLayout = spacingRaw False (Border 0 0 0 0) False (Border windowBorderWidth windowBorderWidth windowBorderWidth windowBorderWidth) True $ avoidStruts (multiColLayout ||| tiled ||| Mirror tiled ||| ThreeCol 1 (3/100) (1/3))
   where
      -- default tiling algorithm partitions the screen into two panes
      tiled   = Tall nmaster delta ratio
@@ -238,10 +260,6 @@ myEventHook = mempty
 ------------------------------------------------------------------------
 -- Status bars and logging
 
--- Perform an arbitrary action on each internal state change or X event.
--- See the 'XMonad.Hooks.DynamicLog' extension for examples.
---
-myLogHook = return ()
 
 ------------------------------------------------------------------------
 -- Startup hook
@@ -251,7 +269,9 @@ myLogHook = return ()
 -- per-workspace layout choices.
 --
 -- By default, do nothing.
-myStartupHook = spawnOnce "xmodmap ~/.Xmodmap"
+myStartupHook = do
+      spawnOnce "nitrogen --restore --random &"
+      spawnOnce "xmodmap ~/.Xmodmap"
 
 ------------------------------------------------------------------------
 -- Now run xmonad with all the defaults we set up.
@@ -260,15 +280,7 @@ myStartupHook = spawnOnce "xmodmap ~/.Xmodmap"
 --
 main = do
   xmproc <- spawnPipe "xmobar"
-  xmonad $ docks defaults
-
--- A structure containing your configuration settings, overriding
--- fields in the default config. Any you don't override, will
--- use the defaults defined in xmonad/XMonad/Config.hs
---
--- No need to modify this.
---
-defaults = def {
+  xmonad $ docks def {
       -- simple stuff
         terminal           = myTerminal,
         focusFollowsMouse  = myFocusFollowsMouse,
@@ -287,10 +299,28 @@ defaults = def {
         layoutHook         = myLayout,
         manageHook         = myManageHook,
         handleEventHook    = myEventHook,
-        logHook            = myLogHook,
+-- Perform an arbitrary action on each internal state change or X event.
+-- See the 'XMonad.Hooks.DynamicLog' extension for examples.
+--
+        logHook            = dynamicLogWithPP $
+                    xmobarPP {
+                              ppOutput = hPutStrLn xmproc
+
+                            , ppCurrent = xmobarColor "#98be65" "" . wrap "[" "]"           -- Current workspace
+                            , ppVisible = xmobarColor "#98be65" ""              -- Visible but not current workspace
+                            , ppHidden = xmobarColor "#82AAFF" "" . wrap "*" "" -- Hidden workspaces
+                            , ppHiddenNoWindows = xmobarColor "#c792ea" ""     -- Hidden workspaces (no windows)
+                            , ppTitle = xmobarColor "#b3afc2" "" . shorten 60               -- Title of active window
+                            , ppSep =  " | "                    -- Separator character
+                            , ppUrgent = xmobarColor "#C45500" "" . wrap "!" "!"            -- Urgent workspace
+                            , ppOrder  = \(ws:l:t:ex) -> [ws, l]++ex++[t]                    -- order of things in xmobar
+
+                    },
         startupHook        = myStartupHook
     }
 
+
+--
 -- | Finally, a copy of the default bindings in simple textual tabular format.
 help :: String
 help = unlines ["The default modifier key is 'alt'. Default keybindings:",

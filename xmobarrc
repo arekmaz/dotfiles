@@ -15,12 +15,8 @@ Config { font = "xft:Ubuntu Mono:size=15"
        , iconRoot = "."
        , allDesktops = True
        , overrideRedirect = True
-       , commands = [ Run Weather "EGPF" ["-t","<station>: <tempC>C",
-                                          "-L","18","-H","25",
-                                          "--normal","green",
-                                          "--high","red",
-                                          "--low","lightblue"] 36000
-                    , Run Network "eth0" ["-L","0","-H","32",
+       , commands = [
+                      Run Network "eth0" ["-L","0","-H","32",
                                           "--normal","green","--high","red"] 10
                     , Run Network "eth1" ["-L","0","-H","32",
                                           "--normal","green","--high","red"] 10
@@ -30,9 +26,24 @@ Config { font = "xft:Ubuntu Mono:size=15"
                     , Run Swap [] 10
                     , Run Com "uname" ["-s","-r"] "" 36000
                     , Run Date "%a %b %_d %Y %H:%M:%S" "date" 10
+                    , Run UnsafeStdinReader
+                    , Run Battery ["--template" , "<acstatus>"
+                             , "--Low"      , "10"        -- units: %
+                             , "--High"     , "80"        -- units: %
+                             , "--low"      , "darkred"
+                             , "--normal"   , "darkorange"
+                             , "--high"     , "darkgreen"
+
+                             , "--" -- battery specific options
+                                       -- discharging status
+                                       , "-o", "<left>% (<timeleft> left)"
+                                       -- AC "on" status
+                                       , "-O", "<fc=#dAA520>Charging</fc>"
+                                       -- charged status
+                                       , "-i", "<fc=#006000>Charged</fc>"
+                             ] 50
                     ]
        , sepChar = "%"
        , alignSep = "}{"
-       , template = "%cpu% | %memory% * %swap% | %eth0% - %eth1% }\
-                    \{ <fc=#ee9a00>%date%</fc>| %EGPF% | %uname%"
+       , template = "%UnsafeStdinReader%}{ %cpu% | %memory% | %battery% | <fc=#ee9a00>%date%</fc> "
        }

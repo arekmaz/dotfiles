@@ -18,9 +18,6 @@
 !/.config/alacritty
 !/.config/alacritty/**
 
-!/.config/htop
-!/.config/htop/**
-
 !/.config/zed
 /.config/zed/**
 !/.config/zed/settings.json

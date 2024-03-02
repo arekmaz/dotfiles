@@ -35,6 +35,7 @@
   "prettier.nvim": { "branch": "main", "commit": "d98e732cb73690b07c00c839c924be1d1d9ac5c2" },
   "refactoring.nvim": { "branch": "master", "commit": "1b593e7203b31c7bde3fa638e6869144698df3b6" },
   "stylua-nvim": { "branch": "main", "commit": "ce59a353f02938cba3e0285e662fcd3901cd270f" },
+  "tailwindcss-language-server": { "branch": "main", "commit": "b4f500a46b1f25fbb395c96ba515f00fffc593be" },
   "telescope-file-browser.nvim": { "branch": "master", "commit": "48ffb8de688a22942940f50411d5928631368848" },
   "telescope-fzf-native.nvim": { "branch": "main", "commit": "6c921ca12321edaa773e324ef64ea301a1d0da62" },
   "telescope.nvim": { "branch": "master", "commit": "d90956833d7c27e73c621a61f20b29fdb7122709" },

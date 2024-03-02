@@ -6,7 +6,8 @@ lsp.ensure_installed({
   'tsserver',
   'lua_ls',
   'eslint',
-  'jsonls'
+  'jsonls',
+  'tailwindcss'
   -- 'rust_analyzer',
 })
 

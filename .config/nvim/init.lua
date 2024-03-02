@@ -104,6 +104,8 @@ require("lazy").setup({
       -- Snippets
       { "L3MON4D3/LuaSnip" },
       { "rafamadriz/friendly-snippets" },
+
+      { "laureanray/tailwindcss-language-server" },
     },
   },
 

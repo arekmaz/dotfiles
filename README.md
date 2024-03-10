@@ -8,7 +8,7 @@ setup:
 cd
 
 # clone bare into ~/.dotfiles folder
-gcl git@github.com:arekmaz/dotfiles.git --bare .dotfiles --depth 1
+git clone git@github.com:arekmaz/dotfiles.git --bare .dotfiles --depth 1
 
 # one time "dotfiles" alias def
 alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'

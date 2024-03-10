@@ -3,6 +3,9 @@
 !README.md
 !.zshrc
 !.zshenv
+!.profile
+!.bashrc
+!.hushlogin
 !.tmux.conf
 !.gitignore.defaults
 !.vimrc

@@ -40,4 +40,4 @@ case ":$PATH:" in
 esac
 # pnpm end
 
-export FZF_CTRL_T_COMMAND='fd . --absolute-path --hidden --max-results=100000 | sed "s|$HOME|~|"'
+export FZF_CTRL_T_COMMAND='fd . --absolute-path --hidden --max-results=1000000 | sed "s|$HOME|~|"'

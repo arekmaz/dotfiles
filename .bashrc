@@ -40,4 +40,23 @@ case ":$PATH:" in
 esac
 # pnpm end
 
-export FZF_CTRL_T_COMMAND='fd . --absolute-path --hidden --max-results=1000000 | sed "s|$HOME|~|"'
+export FZF_CTRL_T_COMMAND='fd . --absolute-path --hidden --max-results=1000000 | sed "s|^$HOME|~|"'
+
+__fzf_select__() {
+  local cmd opts
+  cmd="${FZF_CTRL_T_COMMAND:-"command find -L . -mindepth 1 \\( -path '*/.*' -o -fstype 'sysfs' -o -fstype 'devfs' -o -fstype 'devtmpfs' -o -fstype 'proc' \\) -prune \
+    -o -type f -print \
+    -o -type d -print \
+    -o -type l -print 2> /dev/null | command cut -b3-"}"
+  opts="--height ${FZF_TMUX_HEIGHT:-40%} --bind=ctrl-z:ignore --reverse --scheme=path ${FZF_DEFAULT_OPTS-} ${FZF_CTRL_T_OPTS-} -m"
+  eval "$cmd" |
+    FZF_DEFAULT_OPTS="$opts" $(__fzfcmd) "$@" |
+    while read -r item; do
+      if [[ "$item" == ~* ]]
+      then
+        printf "~%q " "${item:1}"
+      else
+        printf '%q ' "$item"  # escape special chars
+      fi
+    done
+}

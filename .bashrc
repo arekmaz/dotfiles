@@ -14,7 +14,6 @@ export EDITOR='nvim'
 
 alias ls='ls --color=auto'
 
-alias fly_push='gwip && npm version patch && gp && fly deploy'
 
 export PATH="$PATH:$HOME/scripts"
 
@@ -60,3 +59,7 @@ __fzf_select__() {
       fi
     done
 }
+
+alias gwip='git add -A; git rm $(git ls-files --deleted) 2> /dev/null; git commit --no-verify --no-gpg-sign --message "--wip-- [skip ci]"'
+alias unwip='git rev-list --max-count=1 --format="%s" HEAD | grep -q "--wip--" && git reset HEAD~1'
+alias fly_push='gwip && npm version patch && git push && fly deploy'

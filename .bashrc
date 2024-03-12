@@ -39,7 +39,7 @@ case ":$PATH:" in
 esac
 # pnpm end
 
-export FZF_CTRL_T_COMMAND='fd . --absolute-path --hidden --max-results=1000000 | sed "s|^$HOME|~|"'
+export FZF_CTRL_T_COMMAND='fd . $HOME --absolute-path --hidden --max-results=1000000 | sed "s|^$HOME|~|"'
 
 __fzf_select__() {
   local cmd opts
@@ -53,7 +53,7 @@ __fzf_select__() {
     while read -r item; do
       if [[ "$item" == ~* ]]
       then
-        printf "~%q " "${item:1}"
+        printf "~%q " "${item:1}" # if starts with ~, dont escape it at the start
       else
         printf '%q ' "$item"  # escape special chars
       fi

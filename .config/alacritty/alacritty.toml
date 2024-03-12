@@ -8,8 +8,11 @@ family = "Monaco Nerd Font"
 
 [window]
 decorations = "buttonless"
+# blur = true
+# opacity = 0.5
+option_as_alt = "Both"
 
 [window.padding]
-x = 7
+x = 4
 y = 0
 

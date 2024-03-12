@@ -12,6 +12,8 @@
 
 !/scripts
 
+/scripts/work*
+
 !/.config
 /.config/**/
 

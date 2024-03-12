@@ -1,17 +1,3 @@
 #!/bin/sh
-cmd_file=$(command -v "$1")
-
-scripts_dir="$HOME/scripts"
-new_file="$scripts_dir/$1";
-
-if test -n "$cmd_file";
-
-then
-  exec nvim "$cmd_file"
-elif [ ! -f $new_file ]
-
-then
-  echo "creating $new_file";
-  nvim "$new_file" && chmod +x "$new_file";
-fi
-
+cmd=$(command -v "$1")
+test -n "$cmd" && exec nvim "$cmd"

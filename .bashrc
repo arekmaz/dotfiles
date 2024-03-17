@@ -39,7 +39,7 @@ case ":$PATH:" in
 esac
 # pnpm end
 
-export FZF_CTRL_T_COMMAND='fd . $HOME --absolute-path --hidden --max-results=1000000 | sed "s|^$HOME|~|"'
+export FZF_CTRL_T_COMMAND='fd . --absolute-path --hidden --max-results=1000000 | sed "s|^$HOME|~|"'
 
 __fzf_select__() {
   local cmd opts
@@ -60,6 +60,4 @@ __fzf_select__() {
     done
 }
 
-alias gwip='git add -A; git rm $(git ls-files --deleted) 2> /dev/null; git commit --no-verify --no-gpg-sign --message "--wip-- [skip ci]"'
-alias unwip='git rev-list --max-count=1 --format="%s" HEAD | grep -q "--wip--" && git reset HEAD~1'
 alias fly_push='gwip && npm version patch && git push && fly deploy'

@@ -1,0 +1,5 @@
+#!/bin/bash
+base=$(basename "$1")
+output_filename="${base%.md}.pdf"
+output="/tmp/$output_filename"
+pandoc -s "$1" -o $output && open $output

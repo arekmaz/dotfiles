@@ -13,6 +13,7 @@ alias ls='ls --color=auto'
 
 
 export PATH="$PATH:$HOME/scripts"
+export PATH="$PATH:/Library/TeX/texbin"
 
 export SB_HOME="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/me"
 alias sb='cd "$SB_HOME"'

@@ -77,13 +77,28 @@ o.colorcolumn = "80"
 o.guicursor = "i:ver80-Cursor"
 
 o.history = 10000
-o.path = "**"
+
+
+local cwDir = vim.fn.getcwd()
+local cwdContent = vim.split(vim.fn.glob(cwDir .. "/*/"), '\n', {trimempty=true})
+
+local path = '.'
+
+for _, dir in pairs(cwdContent) do
+    if not string.find(dir, '/node_modules/') then
+        path = path .. ',' .. dir .. '**'
+    end
+end
+
+o.path = path
 
 g.netrw_liststyle=3
 
 g.netrw_list_hide = ".*\\.swp$,.DS_Store,*/tmp/*,*.so,*.swp,*.zip,*.git,^\\.\\.\\=/\\=$"
 
-o.wildignore = '*/node_modules/*,*/.git/*'
+g.netrw_preview = 1
+
+-- o.wildignore = '*/node_modules/*,*/.git/*'
 
 local lsp_zero = require('lsp-zero')
 

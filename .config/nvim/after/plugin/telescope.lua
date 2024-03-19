@@ -11,7 +11,7 @@ local telescope = require('telescope')
 
 --Telescope stuff I need to import for configuration
 local actions = require 'telescope.actions'
-local themes = require 'telescope.themes'
+-- local themes = require 'telescope.themes'
 
 -- files to ignore with `file_ignore_patterns`
 local always_ignore_these = {
@@ -120,7 +120,7 @@ local default_picker_opts = {
     no_ignore = false,
   },
   -- lsp_code_actions = themes.get_dropdown(),
-  lsp_range_code_actions = themes.get_dropdown(),
+  -- lsp_range_code_actions = themes.get_dropdown(),
 }
 
 -- TELESCOPE CONFIG
@@ -142,6 +142,8 @@ telescope.setup {
         ['<c-s>'] = actions.select_horizontal,
         ['<c-t>'] = actions.send_to_qflist + actions.open_qflist,
         ['<c-c>'] = actions.close,
+        ["<C-j>"] = actions.move_selection_next,
+        ["<C-k>"] = actions.move_selection_previous,
       },
       i = {
         ['<c-x>'] = false,
@@ -149,6 +151,8 @@ telescope.setup {
         ['<c-t>'] = actions.send_to_qflist + actions.open_qflist,
         ['<c-c>'] = actions.close,
         ['<c-k>'] = actions.delete_buffer,
+        ["<C-j>"] = actions.move_selection_next,
+        ["<C-k>"] = actions.move_selection_previous,
       },
     },
     color_devicons = true,
@@ -200,11 +204,11 @@ require('telescope').load_extension 'file_browser'
   --}
 --end)
 
--- local builtin = function(lhs, picker, label)
---   vim.keymap.set('n', lhs, function()
---     require('telescope.builtin')[picker]()
---   end, { desc = label })
--- end
+local builtin = function(lhs, picker, label)
+  vim.keymap.set('n', lhs, function()
+    require('telescope.builtin')[picker]()
+  end, { desc = label })
+end
 
 local custom = function(lhs, picker, label, opts)
   opts = opts or {}
@@ -217,7 +221,7 @@ end
 --builtin('<leader>fw', 'grep_string', 'Grep string')
 --builtin('<leader>gw', 'live_grep', 'Live grep')
 --builtin('<leader>/', 'current_buffer_fuzzy_find', 'Fuzzy find in buffer')
---builtin('<leader>gl', 'git_commits', 'Git commits') -- git log
+builtin('<leader>gl', 'git_commits', 'Git commits') -- git log
 --builtin('<leader>gb', 'git_branches', 'Git branches')
 --builtin('<leader>gh', 'help_tags', 'Help tags')
 --builtin('<leader>gm', 'man_pages', 'Man pages')
@@ -237,7 +241,7 @@ custom('<C-p>', 'find_files', 'Find files all', {
 -- find in dotfiles
 custom('<leader>fd', 'find_files', 'Find in dotfiles', {
   cwd = '~/.config',
-  prompt_title = 'files in dotfiles',
+  prompt_title = 'Find files in dotfiles',
 })
 
 -- find in neovim config

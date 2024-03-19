@@ -1,6 +1,6 @@
 vim.opt.guicursor = ""
 
-vim.opt.nu = true
+vim.opt.nu = false
 vim.opt.relativenumber = false
 
 vim.opt.tabstop = 2
@@ -14,6 +14,8 @@ vim.opt.smartcase = true
 vim.opt.ignorecase = true
 
 vim.opt.wrap = true
+
+vim.opt.laststatus = 0
 
 -- vim.opt.autochdir = true
 

@@ -10,7 +10,7 @@ family = "Monaco Nerd Font"
 decorations = "buttonless"
 # blur = true
 # opacity = 0.5
-option_as_alt = "Both"
+#option_as_alt = "Both"
 
 [window.padding]
 x = 4

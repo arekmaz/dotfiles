@@ -1,10 +1,4 @@
-vim.g.mapleader = " " -- Make sure to set `mapleader` before lazy so your mappings are correct
-
-local o = vim.opt
-local g = vim.g
-
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
-
 if not vim.loop.fs_stat(lazypath) then
   vim.fn.system({
     "git",
@@ -16,120 +10,61 @@ if not vim.loop.fs_stat(lazypath) then
   })
 end
 
-o.rtp:prepend(lazypath)
+vim.opt.rtp:prepend(lazypath)
+
+-- Example using a list of specs with the default options
+vim.g.mapleader = " " -- Make sure to set `mapleader` before lazy so your mappings are correct
 
 require("lazy").setup({
+  {
+    "nvim-telescope/telescope.nvim",
+    tag = "0.1.5",
+    dependencies = { { "nvim-lua/plenary.nvim" },
+      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+      {
+        "nvim-telescope/telescope-file-browser.nvim",
+      }
+    },
+  },
   {
     "shaunsingh/nord.nvim",
     config = function()
       vim.cmd("colorscheme nord")
     end,
   },
+  {
+    "VonHeikemen/lsp-zero.nvim",
+    dependencies = {
+      -- LSP Support
+      { "neovim/nvim-lspconfig" },
+      { "williamboman/mason.nvim" },
+      { "williamboman/mason-lspconfig.nvim" },
+      {'hrsh7th/cmp-nvim-lsp'},
+      {'hrsh7th/nvim-cmp'},
+    },
+  },
+
+
   "github/copilot.vim",
-  { 'junegunn/fzf.vim', dependencies = { 'junegunn/fzf' } },
-  {'williamboman/mason.nvim'},
-  {'williamboman/mason-lspconfig.nvim'},
-  {'VonHeikemen/lsp-zero.nvim', branch = 'v3.x'},
-  {'neovim/nvim-lspconfig'},
-  {'hrsh7th/cmp-nvim-lsp'},
-  {'hrsh7th/nvim-cmp'},
-  {'L3MON4D3/LuaSnip'},
-})
 
-
-
-o.guicursor = ""
-
-o.nu = true
-o.relativenumber = false
-
-o.tabstop = 2
-o.softtabstop = 2
-o.shiftwidth = 2
-o.expandtab = true
-
-o.smartindent = true
-
-o.smartcase = true
-o.ignorecase = true
-
-o.wrap = true
-
--- o.autochdir = true
-
-o.swapfile = false
-o.backup = false
-o.undodir = os.getenv("HOME") .. "/.vim/undodir"
-o.undofile = true
-
--- o.hlsearch = true
-o.incsearch = true
-
-o.termguicolors = true
-
-o.scrolloff = 8
-o.signcolumn = "no"
-o.isfname:append("@-@")
-
-o.updatetime = 50
-
-o.colorcolumn = "80"
-
-o.guicursor = "i:ver80-Cursor"
-
-o.history = 10000
-
-
-local cwDir = vim.fn.getcwd()
-local cwdContent = vim.split(vim.fn.glob(cwDir .. "/*/"), '\n', {trimempty=true})
-
-local path = '.'
-
-for _, dir in pairs(cwdContent) do
-
-    if not string.find(dir, 'node_modules') then
-        path = path .. ',' .. dir .. '*'
-    end
-end
-
-o.path = path .. ',,'
--- o.include = '**'
-
---o.wildmode = 'list:longest,list:full'
-
-g.netrw_liststyle=3
-
-g.netrw_list_hide = ".*\\.swp$,.DS_Store,*/tmp/*,*.so,*.swp,*.zip,*.git,^\\.\\.\\=/\\=$"
-
-g.netrw_preview = 1
-
--- o.wildignore = '*/node_modules/*,*/.git/*'
-
-local lsp_zero = require('lsp-zero')
-
-lsp_zero.on_attach(function(client, bufnr)
-  -- see :help lsp-zero-keybindings
-  -- to learn the available actions
-  lsp_zero.default_keymaps({buffer = bufnr})
-
-  -- https://github.com/VonHeikemen/lsp-zero.nvim/blob/14c9164413df4be17a5a0ca9e01a376691cbcaef/lua/lsp-zero/server.lua#L101
-  vim.keymap.set('n', '<leader>.', '<cmd>lua vim.lsp.buf.code_action()<cr>', {buffer = buffer, desc = 'Execute code action'})
-
-
-end)
-
-require('mason').setup({})
-require('mason-lspconfig').setup({
-  -- Replace the language servers listed here 
-  -- with the ones you want to install
-  ensure_installed = {'tsserver', 'rust_analyzer'},
-  handlers = {
-    lsp_zero.default_setup,
+  -- prettier
+  "neovim/nvim-lspconfig",
+  "jose-elias-alvarez/null-ls.nvim",
+  "MunifTanjim/prettier.nvim",
+  {
+    "echasnovski/mini.nvim",
+    -- requires = {
+    --   "lewis6991/gitsigns.nvim"
+    -- },
+    config = function()
+      require("mini.surround").setup()
+      require("mini.comment").setup()
+      require("mini.indentscope").setup()
+      require("mini.jump").setup()
+      require("mini.jump2d").setup()
+      -- require("mini.statusline").setup()
+    end,
   },
 })
 
-require'lspconfig'.tsserver.setup({})
-require'lspconfig'.marksman.setup({})
-
-vim.keymap.set('n', '<leader>p', '<cmd>Files<cr>', {buffer = buffer, desc = 'Fzf Files'})
-vim.keymap.set('n', '<leader>rg', '<cmd>Rg<cr>', {buffer = buffer, desc = 'Fzf rg'})
+require('arek')

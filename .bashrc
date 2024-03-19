@@ -59,3 +59,6 @@ __fzf_select__() {
 }
 
 alias fly_push='gwip && npm version patch && git push && fly deploy'
+
+export FZF_DEFAULT_OPTS="--preview 'bat --style=numbers --line-range :300 {}'
+\ --bind ctrl-u:preview-page-up,ctrl-d:preview-page-down"

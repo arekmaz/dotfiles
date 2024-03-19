@@ -26,6 +26,7 @@ require("lazy").setup({
     end,
   },
   "github/copilot.vim",
+  { 'junegunn/fzf.vim', dependencies = { 'junegunn/fzf' } },
   {'williamboman/mason.nvim'},
   {'williamboman/mason-lspconfig.nvim'},
   {'VonHeikemen/lsp-zero.nvim', branch = 'v3.x'},
@@ -85,12 +86,16 @@ local cwdContent = vim.split(vim.fn.glob(cwDir .. "/*/"), '\n', {trimempty=true}
 local path = '.'
 
 for _, dir in pairs(cwdContent) do
-    if not string.find(dir, '/node_modules/') then
-        path = path .. ',' .. dir .. '**'
+
+    if not string.find(dir, 'node_modules') then
+        path = path .. ',' .. dir .. '*'
     end
 end
 
-o.path = path
+o.path = path .. ',,'
+-- o.include = '**'
+
+--o.wildmode = 'list:longest,list:full'
 
 g.netrw_liststyle=3
 
@@ -125,3 +130,6 @@ require('mason-lspconfig').setup({
 
 require'lspconfig'.tsserver.setup({})
 require'lspconfig'.marksman.setup({})
+
+vim.keymap.set('n', '<leader>p', '<cmd>Files<cr>', {buffer = buffer, desc = 'Fzf Files'})
+vim.keymap.set('n', '<leader>rg', '<cmd>Rg<cr>', {buffer = buffer, desc = 'Fzf rg'})

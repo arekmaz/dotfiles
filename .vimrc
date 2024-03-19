@@ -36,7 +36,9 @@ set wrap
 set ttyfast
 
 "search recursively down
-set path+=**
+"set path+=**
+set path+=.,~/dpd/c2x/frontend/app,~/dpd/c2x/frontend/build,~/dpd/c2x/frontend/docs,~/dpd/c2x/frontend/playwright-report,~/dpd/c2x/frontend/public,~/dpd/c2x/frontend/scripts,~/dpd/c2x/frontend/test-results,~/dpd/c2x/frontend/tests,,
+
 
 set number
 

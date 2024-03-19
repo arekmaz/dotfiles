@@ -1,7 +1,13 @@
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # sync history between all tmux sessions
-export PROMPT_COMMAND="${PROMPT_COMMAND:+PROMPT_COMMAND;}history -a; history -c; history -r;"
+# export PROMPT_COMMAND="${PROMPT_COMMAND:+PROMPT_COMMAND;}history -a; history -c; history -r;"
+
+
+# append unique commands to global history immediately
+shopt -s histappend
+export HISTCONTROL=ignoreboth:erasedups
+export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 
 export PATH=/opt/homebrew/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin
 # Enable the subsequent settings only in interactive sessions

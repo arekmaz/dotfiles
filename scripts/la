@@ -1,2 +1,8 @@
 #!/bin/bash
-exec lsd -1AX "$@"
+exec lsd -1AXF \
+  --group-directories-first \
+  --blocks=date,size,git,name \
+  --date=relative \
+  --size=short \
+  # --total-size \
+  "$@"

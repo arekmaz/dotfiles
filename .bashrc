@@ -1,5 +1,8 @@
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
+# sync history between all tmux sessions
+export PROMPT_COMMAND="${PROMPT_COMMAND:+PROMPT_COMMAND;}history -a; history -c; history -r;"
+
 export PATH=/opt/homebrew/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin
 # Enable the subsequent settings only in interactive sessions
 case $- in
@@ -60,5 +63,5 @@ __fzf_select__() {
 
 alias fly_push='gwip && npm version patch && git push && fly deploy'
 
-export FZF_DEFAULT_OPTS="--preview 'bat --style=numbers --line-range :300 {}'
-\ --bind ctrl-u:preview-page-up,ctrl-d:preview-page-down"
+
+source /Users/arek/.config/broot/launcher/bash/br

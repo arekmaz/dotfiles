@@ -1,17 +1,17 @@
 local builtin = require('telescope.builtin')
--- vim.keymap.set('n', '<C-p>', builtin.find_files, {})
-vim.keymap.set('n', '<leader>ff', builtin.live_grep, { noremap = true })
+-- vim.keymap.set('n', '<leader>pf', builtin.find_files, {})
 -- vim.keymap.set('n', '<C-p>', builtin.git_files, {})
---vim.keymap.set('n', '<leader>ps', function()
-  --builtin.grep_string({ search = vim.fn.input("Grep > ") })
---end)
---vim.keymap.set('n', '<leader>vh', builtin.help_tags, {})
+-- vim.keymap.set('n', '<leader>ps', function()
+--   builtin.grep_string({ search = vim.fn.input("Grep > ") })
+-- end)
+-- vim.keymap.set('n', '<leader>vh', builtin.help_tags, {})
+-- vim.keymap.set('n', '<leader>ff', builtin.live_grep, { noremap = true })
 
 local telescope = require('telescope')
 
 --Telescope stuff I need to import for configuration
 local actions = require 'telescope.actions'
--- local themes = require 'telescope.themes'
+local themes = require 'telescope.themes'
 
 -- files to ignore with `file_ignore_patterns`
 local always_ignore_these = {
@@ -114,13 +114,13 @@ local default_picker_opts = {
     selection_strategy = 'row',
   },
   find_files = {
-    find_command = { 'fd', '--hidden', '--type', 'f', '--max-results', '1000' },
+    find_command = { 'fd', '--hidden', '--type', 'f', '--max-results', '10000' },
     follow = true,
     hidden = true,
     no_ignore = false,
   },
   -- lsp_code_actions = themes.get_dropdown(),
-  -- lsp_range_code_actions = themes.get_dropdown(),
+  lsp_range_code_actions = themes.get_dropdown(),
 }
 
 -- TELESCOPE CONFIG
@@ -141,6 +141,7 @@ telescope.setup {
         ['<c-x>'] = false,
         ['<c-s>'] = actions.select_horizontal,
         ['<c-t>'] = actions.send_to_qflist + actions.open_qflist,
+        ['<c-q>'] = require('trouble.providers.telescope').open_with_trouble,
         ['<c-c>'] = actions.close,
         ["<C-j>"] = actions.move_selection_next,
         ["<C-k>"] = actions.move_selection_previous,
@@ -149,6 +150,7 @@ telescope.setup {
         ['<c-x>'] = false,
         ['<c-s>'] = actions.select_horizontal,
         ['<c-t>'] = actions.send_to_qflist + actions.open_qflist,
+        ['<c-q>'] = require('trouble.providers.telescope').open_with_trouble,
         ['<c-c>'] = actions.close,
         ['<c-k>'] = actions.delete_buffer,
         ["<C-j>"] = actions.move_selection_next,
@@ -198,11 +200,11 @@ telescope.setup {
 require('telescope').load_extension 'fzf'
 require('telescope').load_extension 'file_browser'
 
---vim.keymap.set('n', '<leader>fb', function()
-  --require('telescope').extensions.file_browser.file_browser {
-    --preview = true,
-  --}
---end)
+-- vim.keymap.set('n', '<leader>fb', function()
+--   require('telescope').extensions.file_browser.file_browser {
+--     preview = true,
+--   }
+-- end)
 
 local builtin = function(lhs, picker, label)
   vim.keymap.set('n', lhs, function()
@@ -217,22 +219,22 @@ local custom = function(lhs, picker, label, opts)
   end, { desc = label })
 end
 
---builtin('<leader>of', 'oldfiles', 'Oldfiles')
---builtin('<leader>fw', 'grep_string', 'Grep string')
---builtin('<leader>gw', 'live_grep', 'Live grep')
---builtin('<leader>/', 'current_buffer_fuzzy_find', 'Fuzzy find in buffer')
-builtin('<leader>gl', 'git_commits', 'Git commits') -- git log
---builtin('<leader>gb', 'git_branches', 'Git branches')
---builtin('<leader>gh', 'help_tags', 'Help tags')
---builtin('<leader>gm', 'man_pages', 'Man pages')
---builtin('<leader>bl', 'buffers', 'List buffers')
---builtin('<leader>ts', 'builtin', 'Telescope pickers')
---builtin('<leader>rm', 'reloader', 'Reload module')
---builtin('<leader>tp', 'resume', 'Previous telescope picker')
---builtin('<leader>ps', 'lsp_dynamic_workspace_symbols', 'Project symbols')
+-- builtin('<leader>of', 'oldfiles', 'Oldfiles')
+builtin('<leader>*', 'grep_string', 'Grep string')
+builtin('<leader>ff', 'live_grep', 'Live grep')
+-- builtin('<leader>/', 'current_buffer_fuzzy_find', 'Fuzzy find in buffer')
+-- builtin('<leader>gl', 'git_commits', 'Git commits') -- git log
+-- builtin('<leader>gb', 'git_branches', 'Git branches')
+-- builtin('<leader>gh', 'help_tags', 'Help tags')
+-- builtin('<leader>gm', 'man_pages', 'Man pages')
+-- builtin('<leader>bl', 'buffers', 'List buffers')
+-- builtin('<leader>ts', 'builtin', 'Telescope pickers')
+-- builtin('<leader>rm', 'reloader', 'Reload module')
+-- builtin('<leader>tp', 'resume', 'Previous telescope picker')
+-- builtin('<leader>ps', 'lsp_dynamic_workspace_symbols', 'Project symbols')
 -- builtin('<leader>ca', 'lsp_code_actions', 'Code actions')
 
-custom('<C-p>', 'find_files', 'Find files all', {
+custom('<C-p>', 'find_files', 'Find in all files', {
   file_ignore_patterns = always_ignore_these,
   no_ignore = true,
   hidden = true
@@ -241,63 +243,63 @@ custom('<C-p>', 'find_files', 'Find files all', {
 -- find in dotfiles
 custom('<leader>fd', 'find_files', 'Find in dotfiles', {
   cwd = '~/.config',
-  prompt_title = 'Find files in dotfiles',
+  prompt_title = 'files in dotfiles',
 })
 
 -- find in neovim config
---custom('<leader>fn', 'find_files', 'Find neovim files', {
-  --cwd = '~/.config/nvim',
-  --prompt_title = 'files in neovim config',
---})
+-- custom('<leader>fn', 'find_files', 'Find neovim files', {
+--   cwd = '~/.config/nvim',
+--   prompt_title = 'files in neovim config',
+-- })
 
 -- grep inside of dotfiles
---custom('<leader>gid', 'live_grep', 'Grep in dotfiles', {
-  --cwd = '~/.config',
-  --prompt_title = 'grep in dotfiles',
---})
+custom('<leader>gid', 'live_grep', 'Grep in dotfiles', {
+  cwd = '~/.config',
+  prompt_title = 'grep in dotfiles',
+})
 
 -- use live_grep with case sensitive enabled
---custom('<leader>gW', 'live_grep', 'Live grep case sensitive', {
-  ----prompt_title = 'live_grep case sensitive',
-  --vimgrep_arguments = {
-    --'rg',
-    --'--color=never',
-    --'--no-heading',
-    --'--with-filename',
-    --'--line-number',
-    --'--column',
-  --},
---})
+-- custom('<leader>gW', 'live_grep', 'Live grep case sensitive', {
+--   prompt_title = 'live_grep case sensitive',
+--   vimgrep_arguments = {
+--     'rg',
+--     '--color=never',
+--     '--no-heading',
+--     '--with-filename',
+--     '--line-number',
+--     '--column',
+--   },
+-- })
 
 -- grep inside of neovim config
---custom('<leader>gin', 'live_grep', 'Grep in neovim files', {
-  --cwd = '~/.config/nvim',
-  --prompt_title = 'grep in neovim config',
---})
+-- custom('<leader>gin', 'live_grep', 'Grep in neovim files', {
+--   cwd = '~/.config/nvim',
+--   prompt_title = 'grep in neovim config',
+-- })
 
 -- grep inside of vim help docs
---custom('<leader>vh', 'live_grep', 'Grep in vim help', {
-  --cwd = os.getenv 'VIMRUNTIME' .. '/doc',
-  --prompt_title = 'Grep in vim help docs',
---})
+-- custom('<leader>vh', 'live_grep', 'Grep in vim help', {
+--   cwd = os.getenv 'VIMRUNTIME' .. '/doc',
+--   prompt_title = 'Grep in vim help docs',
+-- })
 
 -- jump to a buffer
---custom(
-  --'<leader>jb',
-  --'buffers',
-  --'Jump to buffer',
-  --vim.tbl_deep_extend('force', themes.get_dropdown(), {
-    --preview = false,
-    --prompt_title = 'Jump to buffer',
-  --})
---)
+-- custom(
+--   '<leader>jb',
+--   'buffers',
+--   'Jump to buffer',
+--   vim.tbl_deep_extend('force', themes.get_dropdown(), {
+--     preview = false,
+--     prompt_title = 'Jump to buffer',
+--   })
+-- )
 
 -- vim-grepper-like picker with grep_string
---vim.keymap.set('n', '<leader>rg', function()
-  --require('telescope.builtin').grep_string {
-    --prompt_title = 'ripgrepper',
-    --search = vim.fn.input 'ripgrepper > ',
-    --search_dirs = { '$PWD' },
-    --use_regex = true,
-  --}
---end, { desc = 'Ripgrepper' })
+-- vim.keymap.set('n', '<leader>rg', function()
+--   require('telescope.builtin').grep_string {
+--     prompt_title = 'ripgrepper',
+--     search = vim.fn.input 'ripgrepper > ',
+--     search_dirs = { '$PWD' },
+--     use_regex = true,
+--   }
+-- end, { desc = 'Ripgrepper' })

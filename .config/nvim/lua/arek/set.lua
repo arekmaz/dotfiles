@@ -1,6 +1,6 @@
 vim.opt.guicursor = ""
 
-vim.opt.nu = false
+vim.opt.nu = true
 vim.opt.relativenumber = false
 
 vim.opt.tabstop = 2
@@ -14,8 +14,6 @@ vim.opt.smartcase = true
 vim.opt.ignorecase = true
 
 vim.opt.wrap = true
-
-vim.opt.laststatus = 0
 
 -- vim.opt.autochdir = true
 
@@ -46,3 +44,5 @@ vim.g.netrw_list_hide = ".*\\.swp$,.DS_Store,*/tmp/*,*.so,*.swp,*.zip,*.git,^\\.
 vim.g.netrw_preview = 1
 
 vim.g.history = 10000
+
+-- vim.opt.laststatus = 0

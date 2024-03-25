@@ -1,5 +1,5 @@
 #!/bin/bash
-exec lsd -1AXF \
+exec lsd -1AF \
   --group-directories-first \
   --blocks=date,size,git,name \
   --date=relative \

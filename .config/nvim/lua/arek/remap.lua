@@ -10,7 +10,11 @@ vim.keymap.set("n", "N", "Nzzzv")
 
 -- greatest remap ever
 
-vim.keymap.set("n", "gY", '"+yy')
+vim.keymap.set(
+	{ "n", "o", "x" },
+  "gy",
+  '"+y'
+)
 
 vim.keymap.set("n", "<C-\\>", "<cmd>vsp<CR>")
 

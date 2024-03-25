@@ -4,6 +4,9 @@
 size = 20
 
 [font.normal]
+# family = "FiraCode Nerd Font"
+# family = "JetBrainsMono Nerd Font"
+# family = "Iosevka"
 family = "Monaco Nerd Font"
 
 [window]

@@ -19,6 +19,7 @@ decorations = "buttonless"
 x = 4
 y = 0
 
-[env]
+# [env]
 # necessary to support true color in tmux
-TERM = "alacritty-direct"
+# TERM = "alacritty-direct"
+# TERM = "xterm-256color"

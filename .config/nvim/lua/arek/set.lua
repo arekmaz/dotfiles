@@ -27,7 +27,7 @@ vim.opt.incsearch = true
 
 vim.opt.termguicolors = true
 
-vim.opt.scrolloff = 8
+-- vim.opt.scrolloff = 8
 vim.opt.signcolumn = "no"
 vim.opt.isfname:append("@-@")
 
@@ -44,5 +44,9 @@ vim.g.netrw_list_hide = ".*\\.swp$,.DS_Store,*/tmp/*,*.so,*.swp,*.zip,*.git,^\\.
 vim.g.netrw_preview = 1
 
 vim.g.history = 10000
+
+
+vim.opt.list = true
+vim.opt.listchars = "space:·"
 
 -- vim.opt.laststatus = 0

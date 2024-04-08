@@ -2,19 +2,17 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # sync history between all tmux sessions
 
-
 # append unique commands to global history immediately
 shopt -s histappend
 export HISTCONTROL=ignoreboth:erasedups
 # export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
 export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 
-set -o vi
-bind 'set completion-ignore-case on'
-bind 'TAB:menu-complete'
-bind '"\e[Z":menu-complete-backward'
-bind 'set show-all-if-ambiguous on'
-
+# set -o vi
+# bind 'set completion-ignore-case on'
+# bind 'TAB:menu-complete'
+# bind '"\e[Z":menu-complete-backward'
+# bind 'set show-all-if-ambiguous on'
 
 export PATH=/opt/homebrew/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin
 # Enable the subsequent settings only in interactive sessions
@@ -23,10 +21,9 @@ case $- in
     *) return;;
 esac
 
-export EDITOR='nvim'
+export EDITOR='vi'
 
-alias ls='ls --color=auto'
-
+# alias ls='ls --color=auto'
 
 export PATH="$PATH:$HOME/scripts"
 export PATH="$PATH:/Library/TeX/texbin"
@@ -50,11 +47,13 @@ function show_user_host_if_remote() {
   if [[ "$current_host" != "$home_host" ]]; then
     local user=$(whoami)
     local host=$(hostname -s) # -f for fully qualified domain name, if necessary
-    echo "${user}@${host}"
+    echo "${user}@${host}:"
   fi
 }
 
-export PS1="\[\e[91m\]\$(parse_git_branch)\$(show_user_host_if_remote)\[\e[32m\][\w]\[\e[00m\]$ "
+# export PS1="\[\e[91m\]\$(parse_git_branch)\$(show_user_host_if_remote)\[\e[32m\][\w]\[\e[00m\]$ "
+# export PS1="\$(show_user_host_if_remote)\w$ "
+export PS1="\$(whoami)@$(hostname -s):\w$ "
 
 
 # pnpm
@@ -88,9 +87,11 @@ __fzf_select__() {
 
 alias fly_push='gwip && npm version patch && git push && fly deploy'
 
-
-source /Users/arek/.config/broot/launcher/bash/br
-
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH=$BUN_INSTALL/bin:$PATH
+
+if [[ "$TERM" == "alacritty" ]]; then
+  alias tmux='TERM=alacritty-direct $(which tmux)'
+  alias ssh='TERM=xterm-256color ssh'
+fi

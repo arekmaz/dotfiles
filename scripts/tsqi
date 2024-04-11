@@ -1,0 +1,96 @@
+#!/usr/bin/env bun
+
+import ts from "typescript";
+import fs from "fs";
+import path from "path";
+
+function getTypeInfo(filePath: string, position: number) {
+    // Read the TypeScript file
+    const fileContents = fs.readFileSync(filePath, "utf8");
+
+    // Create a TypeScript program
+    const program = ts.createProgram([filePath], {
+        target: ts.ScriptTarget.ES5,
+        module: ts.ModuleKind.CommonJS
+    });
+
+    // Get the type checker from the program
+    const checker = program.getTypeChecker();
+
+    // Get the source file from the program
+    const sourceFile = program.getSourceFile(filePath);
+    if (!sourceFile) {
+        console.error("File not found in program");
+        return;
+    }
+
+    // Find the node at the given position
+    const node = findNodeAtPosition(sourceFile, position);
+    if (!node) {
+        console.error("No node found at the given position");
+        return;
+    }
+
+    // Get the type of the node
+    const type = checker.getTypeAtLocation(node);
+    const typeString = checker.typeToString(type, node,
+ts.TypeFormatFlags.NoTruncation
+| ts.TypeFormatFlags.MultilineObjectLiterals
+| ts.TypeFormatFlags.AllowUniqueESSymbolType
+// | ts.TypeFormatFlags.UseAliasDefinedOutsideCurrentScope,
+ | ts.TypeFormatFlags.InTypeAlias
+);
+
+    console.log(`Type at position ${position}`)
+    console.log(typeString);
+}
+
+function findNodeAtPosition(sourceFile: ts.SourceFile, position: number): ts.Node | undefined {
+    function find(node: ts.Node): ts.Node | undefined {
+        if (position >= node.getStart() && position < node.getEnd()) {
+            return ts.forEachChild(node, find) || node;
+        }
+    }
+    return find(sourceFile);
+}
+
+// Example usage:
+const args = process.argv.slice(2);
+const filePath: string = path.resolve(args[0]);
+const positionArg = args[1]
+const position = /\d+,\d+/.test(positionArg) ? getCursorPosInFile(filePath, +positionArg.split(',')[0], +positionArg.split(',')[1]) : parseInt(positionArg, 10);
+
+getTypeInfo(filePath, position);
+
+function getCursorPosInFile(filePath: string, row: number, col: number): number {
+    try {
+	     // Read the file content
+	     const fileContents = fs.readFileSync(filePath, 'utf8');
+	     // Split the file content into lines
+	     const lines = fileContents.split('\n');
+	     
+	     // Check if the row number is within the file's line range
+	     if (row > lines.length || row < 1) {
+		 console.error('Row number is out of the file\'s line range.');
+		 return -1;
+	     }
+
+	     // Calculate the position
+	     let position = 0;
+	     for (let i = 0; i < row - 1; i++) {
+		 position += lines[i].length + 1; // +1 for the newline character
+	     }
+	     // Add columns from the current row, adjust by -1 for 0-based index
+	     position += col - 1;
+	     // Check if column is within the length of the specific line
+	     if (col > lines[row - 1].length || col < 1) {
+		 console.error('Column number is out of the line\'s character range.');
+		 return -1;
+	     }
+
+             return position;
+     } catch (error) {
+	     console.error('Error reading file:', error);
+	     return -1;
+     }
+}

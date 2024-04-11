@@ -29,6 +29,7 @@ lsp.set_preferences({
 
 local on_attach = function(client, bufnr)
   lsp.default_keymaps({ buffer = bufnr })
+  client.server_capabilities.semanticTokensProvider = nil
 
   local opts = { buffer = bufnr, remap = false }
   --
@@ -68,6 +69,7 @@ require('lspconfig').tsserver.setup {
   --  cmd = {
   -- "typescript-language-server", "--stdio",
   --  }
+
   commands = {
     OrganizeImports = {
       organize_imports,

@@ -1,17 +1,18 @@
-vim.opt.guicursor = ""
+--vim.opt.guicursor = ""
+vim.opt.syntax = "off"
 
-vim.opt.nu = true
-vim.opt.relativenumber = false
+--vim.opt.nu = true
+--vim.opt.relativenumber = false
 
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
 vim.opt.shiftwidth = 2
 vim.opt.expandtab = true
 
-vim.opt.smartindent = true
+-- vim.opt.smartindent = true
 
-vim.opt.smartcase = true
-vim.opt.ignorecase = true
+--vim.opt.smartcase = true
+--vim.opt.ignorecase = true
 
 vim.opt.wrap = true
 
@@ -37,16 +38,15 @@ vim.opt.colorcolumn = "80"
 
 vim.opt.guicursor = "i:ver80-Cursor"
 
-vim.g.netrw_liststyle=3
+-- vim.g.netrw_liststyle=3
 
-vim.g.netrw_list_hide = ".*\\.swp$,.DS_Store,*/tmp/*,*.so,*.swp,*.zip,*.git,^\\.\\.\\=/\\=$"
+-- vim.g.netrw_list_hide = ".*\\.swp$,.DS_Store,*/tmp/*,*.so,*.swp,*.zip,*.git,^\\.\\.\\=/\\=$"
 
-vim.g.netrw_preview = 1
+-- vim.g.netrw_preview = 1
 
 vim.g.history = 10000
 
-
-vim.opt.list = true
-vim.opt.listchars = "space:·"
+-- vim.opt.list = true
+-- vim.opt.listchars = "space:·"
 
 -- vim.opt.laststatus = 0

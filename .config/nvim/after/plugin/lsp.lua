@@ -14,7 +14,8 @@ lsp.preset("recommended")
 -- Fix Undefined global 'vim'
 -- lsp.nvim_workspace()
 
-vim.lsp.set_log_level("debug")
+vim.lsp.set_log_level("off")
+-- vim.lsp.set_log_level("debug")
 
 lsp.set_preferences({
   suggest_lsp_servers = false,
@@ -44,7 +45,7 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', 'gr', '<cmd>Telescope lsp_references<cr>', { buffer = bufnr })
   vim.keymap.set('n', '<leader>org', '<cmd>OrganizeImports<cr>', { buffer = bufnr })
 
-  vim.keymap.set("n", "<leader>vrn", function() vim.lsp.buf.rename() end, opts)
+  vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts)
   -- vim.keymap.set("i", "<C-h>", function() vim.lsp.buf.signature_help() end, opts)
 end
 
@@ -68,6 +69,10 @@ require('lspconfig').tsserver.setup {
   --  cmd = {
   -- "typescript-language-server", "--stdio",
   --  }
+  on_attach = function(client, bufnr)
+    vim.cmd('compiler tsc')
+    vim.opt.makeprg = "npx tsc"
+  end,
   commands = {
     OrganizeImports = {
       organize_imports,

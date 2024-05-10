@@ -15,6 +15,8 @@ export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 # bind 'set show-all-if-ambiguous on'
 
 export PATH=/opt/homebrew/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin
+
+export PATH="$PATH:/opt/homebrew/opt/libpq/bin"
 # Enable the subsequent settings only in interactive sessions
 case $- in
   *i*) ;;

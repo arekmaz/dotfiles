@@ -66,6 +66,7 @@ require("lazy").setup({
     config = function()
       require("mini.surround").setup()
       -- require("mini.align").setup()
+      -- require("mini.files").setup()
       require("mini.comment").setup()
       -- require("mini.indentscope").setup()
       require("mini.jump").setup()
@@ -105,7 +106,7 @@ require("lazy").setup({
     },
   },
 
-  "github/copilot.vim",
+  -- "github/copilot.vim",
 
   -- prettier
   "neovim/nvim-lspconfig",

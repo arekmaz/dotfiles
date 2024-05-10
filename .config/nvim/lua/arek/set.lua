@@ -1,6 +1,7 @@
 vim.opt.guicursor = ""
 
-vim.opt.nu = true
+vim.opt.nu = false
+-- vim.opt.nu = true
 vim.opt.relativenumber = false
 
 vim.opt.tabstop = 2

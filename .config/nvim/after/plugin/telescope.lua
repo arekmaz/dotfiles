@@ -152,7 +152,6 @@ telescope.setup {
         ['<c-t>'] = actions.send_to_qflist + actions.open_qflist,
         ['<c-q>'] = require('trouble.providers.telescope').open_with_trouble,
         ['<c-c>'] = actions.close,
-        ['<c-k>'] = actions.delete_buffer,
         ["<C-j>"] = actions.move_selection_next,
         ["<C-k>"] = actions.move_selection_previous,
       },
@@ -230,7 +229,7 @@ builtin('<leader>ff', 'live_grep', 'Live grep')
 -- builtin('<leader>bl', 'buffers', 'List buffers')
 -- builtin('<leader>ts', 'builtin', 'Telescope pickers')
 -- builtin('<leader>rm', 'reloader', 'Reload module')
--- builtin('<leader>tp', 'resume', 'Previous telescope picker')
+builtin('<leader>tp', 'resume', 'Previous telescope picker')
 -- builtin('<leader>ps', 'lsp_dynamic_workspace_symbols', 'Project symbols')
 -- builtin('<leader>ca', 'lsp_code_actions', 'Code actions')
 

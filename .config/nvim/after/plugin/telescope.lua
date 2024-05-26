@@ -127,6 +127,7 @@ local default_picker_opts = {
 telescope.setup {
   pickers = default_picker_opts,
   defaults = {
+    wrap_results = true,
     vimgrep_arguments = {
       'rg',
       '--color=never',

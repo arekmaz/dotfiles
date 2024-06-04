@@ -147,7 +147,9 @@ end
 builtin('<leader>*', 'grep_string', 'Grep string')
 builtin('<leader>/', 'live_grep', 'Live grep')
 builtin('<leader>p', 'pickers', 'Previous telescope picker')
-builtin('<leader>g', 'git_bcommits', 'Search history')
+builtin('<leader>g', 'git_bcommits', 'File commits')
+builtin('<leader>r', 'resume', 'Resume')
+builtin('<leader>ql', 'quickfix', 'Quickfix list')
 
 custom('<leader><Space>', 'find_files', 'Find in all files', {
   file_ignore_patterns = always_ignore_these,

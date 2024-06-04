@@ -51,3 +51,5 @@ vim.opt.list = true
 vim.opt.listchars = "space:·"
 
 -- vim.opt.laststatus = 0
+--
+-- vim.opt.scrolloff = 5

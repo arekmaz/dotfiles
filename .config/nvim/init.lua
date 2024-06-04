@@ -12,8 +12,7 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
--- Example using a list of specs with the default options
-vim.g.mapleader = " " -- Make sure to set `mapleader` before lazy so your mappings are correct
+vim.g.mapleader = " "
 
 require("lazy").setup({
   "ckipp01/stylua-nvim",
@@ -27,27 +26,10 @@ require("lazy").setup({
       }
     },
   },
-  -- {
-  --   "ellisonleao/gruvbox.nvim",
-  --   config = function()
-  --     vim.cmd("colorscheme gruvbox")
-  --   end,
-  -- },
   {
     "shaunsingh/nord.nvim",
     config = function()
       vim.cmd("colorscheme nord")
-    end,
-  },
-  {
-    "folke/trouble.nvim",
-    config = function()
-      require("trouble").setup({
-        icons = false,
-        -- your configuration comes here
-        -- or leave it empty to use the default settings
-        -- refer to the configuration section below
-      })
     end,
   },
   {
@@ -88,7 +70,9 @@ require("lazy").setup({
       -- LSP Support
       { "neovim/nvim-lspconfig" },
       { "williamboman/mason.nvim" },
-      { "williamboman/mason-lspconfig.nvim" },
+      {
+        "williamboman/mason-lspconfig.nvim",
+      },
 
       -- Autocompletion
       { "hrsh7th/nvim-cmp" },
@@ -112,15 +96,6 @@ require("lazy").setup({
   "neovim/nvim-lspconfig",
   "jose-elias-alvarez/null-ls.nvim",
   "MunifTanjim/prettier.nvim",
-  {
-    "iamcco/markdown-preview.nvim",
-    cmd = { "MarkdownPreviewToggle", "MarkdownPreview", "MarkdownPreviewStop" },
-    build = "cd app && yarn install",
-    init = function()
-      vim.g.mkdp_filetypes = { "markdown" }
-    end,
-    ft = { "markdown" },
-  },
   { "chrisgrieser/nvim-spider", lazy = true },
 })
 

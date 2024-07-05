@@ -92,6 +92,11 @@ local default_picker_opts = {
 telescope.setup {
   pickers = default_picker_opts,
   defaults = {
+    cache_picker = {
+      num_pickers = 100,
+      limit_entries = 10000,
+      ignore_empty_prompt = true,
+    },
     wrap_results = true,
     vimgrep_arguments = {
       'rg',
@@ -148,9 +153,9 @@ builtin('<leader>*', 'grep_string', 'Grep string')
 builtin('<leader>/', 'live_grep', 'Live grep')
 
 custom('<leader>ql', 'quickfix', 'Quickfix list', {initial_mode = 'normal'})
-custom('<leader>g', 'git_bcommits', 'File commits', {initial_mode = 'normal'})
-custom('<leader>p', 'pickers', 'Previous telescope picker', {initial_mode = 'normal'})
-custom('<leader>r', 'resume', 'Resume', {initial_mode = 'normal'})
+custom('<leader>gg', 'git_bcommits', 'File commits', {initial_mode = 'normal'})
+custom('<leader>pp', 'pickers', 'Previous telescope picker', {initial_mode = 'normal'})
+custom('<leader>rr', 'resume', 'Resume', {initial_mode = 'normal'})
 
 custom('<leader><Space>', 'find_files', 'Find in all files', {
   file_ignore_patterns = always_ignore_these,

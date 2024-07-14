@@ -35,6 +35,9 @@ local on_attach = function(client, bufnr)
 
   local opts = { buffer = bufnr, remap = false }
 
+  vim.cmd('compiler tsc')
+  vim.opt.makeprg = "npx tsc"
+
   vim.keymap.set("n", "gh", function() vim.lsp.buf.hover() end, opts)
   vim.keymap.set("n", "gl", function() vim.diagnostic.open_float() end, opts)
   vim.keymap.set("n", "<leader>[", function() vim.diagnostic.goto_next() end, opts)
@@ -43,9 +46,9 @@ local on_attach = function(client, bufnr)
   vim.keymap.set('n', 'gd', '<cmd>Telescope lsp_definitions<cr>', { buffer = bufnr })
   vim.keymap.set('n', 'gt', '<cmd>Telescope lsp_type_definitions<cr>', { buffer = bufnr })
 
-    vim.keymap.set('n', '<leader>org', organize_imports, { buffer = bufnr })
+  vim.keymap.set('n', '<leader>org', organize_imports, { buffer = bufnr })
 
-    vim.keymap.set('n', '<leader>sel', select_ts_version, { buffer = bufnr })
+  vim.keymap.set('n', '<leader>sel', select_ts_version, { buffer = bufnr })
 
   vim.keymap.set("n", "<leader>.", function() vim.lsp.buf.code_action() end, opts)
   if vim.lsp.buf.range_code_action then
@@ -64,15 +67,6 @@ lsp.on_attach(on_attach)
 vim.diagnostic.config({
   virtual_text = true
 })
-
-
-require('lspconfig').vtsls.setup {
-  on_attach = function(client, bufnr)
-    vim.cmd('compiler tsc')
-    vim.opt.makeprg = "npx tsc"
-  end,
-}
-
 
 require('mason').setup({})
 require('mason-lspconfig').setup({

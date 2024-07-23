@@ -89,9 +89,11 @@ local default_picker_opts = {
   },
 }
 
+
 telescope.setup {
   pickers = default_picker_opts,
   defaults = {
+    dynamic_preview_title = true,
     cache_picker = {
       num_pickers = 100,
       limit_entries = 10000,

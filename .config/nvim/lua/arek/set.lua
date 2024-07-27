@@ -48,7 +48,7 @@ vim.g.history = 10000
 
 
 vim.opt.list = true
-vim.opt.listchars = "space:·"
+-- vim.opt.listchars = "space:·"
 
 -- vim.opt.laststatus = 0
 --

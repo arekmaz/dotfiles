@@ -14,6 +14,40 @@ vim.opt.rtp:prepend(lazypath)
 
 vim.g.mapleader = " "
 
+local themePlugin =
+  {
+    "shaunsingh/nord.nvim",
+    config = function()
+      vim.cmd("colorscheme nord")
+    end,
+  }
+  -- {
+  --   "rebelot/kanagawa.nvim",
+  --   config = function()
+  --     vim.cmd("colorscheme kanagawa")
+  --   end,
+  -- }
+  -- {
+  --   "catppuccin/nvim",
+  --   config = function()
+  --     require("catppuccin").setup({
+  --       flavour = "latte",
+  --     flavour = "auto", -- latte, frappe, macchiato, mocha
+  --     });
+  --     vim.cmd("colorscheme catppuccin")
+  --   end,
+  -- }
+  -- {
+  --   "rose-pine/neovim",
+  --   config = function()
+  --     require("rose-pine").setup({
+  --       variant = "dawn",
+  --       -- variant = "auto", -- auto, main, moon, or dawn
+  --     });
+  --     vim.cmd("colorscheme rose-pine")
+  --   end,
+  -- }
+
 require("lazy").setup({
   "djoshea/vim-autoread",
   "ckipp01/stylua-nvim",
@@ -28,12 +62,6 @@ require("lazy").setup({
     },
   },
   {
-    "shaunsingh/nord.nvim",
-    config = function()
-      vim.cmd("colorscheme nord")
-    end,
-  },
-  {
     "nvim-treesitter/nvim-treesitter",
     run = function()
       local ts_update = require("nvim-treesitter.install").update({ with_sync = true })
@@ -41,6 +69,7 @@ require("lazy").setup({
     end,
   },
   "mbbill/undotree",
+  themePlugin,
   {
     "echasnovski/mini.nvim",
     -- requires = {

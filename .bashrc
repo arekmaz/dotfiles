@@ -37,7 +37,7 @@ case $- in
     *) return;;
 esac
 
-export EDITOR='vi'
+export EDITOR='nvim'
 
 # alias ls='ls --color=auto'
 

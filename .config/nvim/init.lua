@@ -22,6 +22,21 @@ local themePlugin =
     end,
   }
   -- {
+  --   "whatyouhide/vim-gotham",
+  --   config = function()
+  --     vim.cmd("colorscheme gotham")
+  --   end,
+  -- }
+  -- {
+  --   "neanias/everforest-nvim",
+  --   config = function()
+  --     require("everforest").setup({
+  --       sign_column_background = 'none'
+  --     })
+  --     vim.cmd("colorscheme everforest")
+  --   end,
+  -- }
+  -- {
   --   "rebelot/kanagawa.nvim",
   --   config = function()
   --     vim.cmd("colorscheme kanagawa")

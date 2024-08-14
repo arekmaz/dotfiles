@@ -1,2 +1,2 @@
 #!/bin/bash
-(cd ~/.config/nvim && nvim .)
+(cd ~/.config/nvim && nvim init.lua)

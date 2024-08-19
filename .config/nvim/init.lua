@@ -79,7 +79,6 @@ local themePlugin =
 
 require("lazy").setup({
   "djoshea/vim-autoread",
-  "ckipp01/stylua-nvim",
   {
     "nvim-telescope/telescope.nvim",
     tag = "0.1.5",
@@ -111,8 +110,8 @@ require("lazy").setup({
       -- require("mini.files").setup()
       require("mini.comment").setup()
       -- require("mini.indentscope").setup()
-      require("mini.jump").setup()
-      require("mini.jump2d").setup()
+      -- require("mini.jump").setup()
+      -- require("mini.jump2d").setup()
       -- require("mini.statusline").setup()
       -- require("mini.basics").setup()
     end,
@@ -155,6 +154,7 @@ require("lazy").setup({
   "neovim/nvim-lspconfig",
   "jose-elias-alvarez/null-ls.nvim",
   "MunifTanjim/prettier.nvim",
+
   { "chrisgrieser/nvim-spider", lazy = true },
 })
 

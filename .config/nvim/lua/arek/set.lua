@@ -34,7 +34,7 @@ vim.opt.isfname:append("@-@")
 
 vim.opt.updatetime = 50
 
-vim.opt.colorcolumn = "80"
+-- vim.opt.colorcolumn = "80"
 
 vim.opt.guicursor = "i:ver80-Cursor"
 
@@ -48,6 +48,7 @@ vim.g.history = 10000
 
 
 vim.opt.list = true
+vim.opt.laststatus = 0
 -- vim.opt.listchars = "space:·"
 
 -- vim.opt.laststatus = 0

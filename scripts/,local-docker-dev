@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e
+
+imageid=$(docker build -q -f ~/scripts/Dockerfile-dev .)
+
+echo created image id: $imageid
+
+docker run --rm -v.:/root/workspace -it $imageid /bin/bash
+

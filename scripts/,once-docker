@@ -1,0 +1,18 @@
+#!/bin/bash
+
+set -e
+set -x
+
+buildcmd="docker build -q -f ${1-./Dockerfile} ${2-.}"
+
+echo running $buildcmd
+
+imageid=$($buildcmd)
+
+echo image id $imageid
+
+runcmd="docker run --rm -it $imageid /bin/bash"
+
+echo running $runcmd
+
+$runcmd

@@ -111,3 +111,5 @@ if [[ "$TERM" == "alacritty" ]]; then
   alias tmux='TERM=alacritty-direct $(which tmux)'
   alias ssh='TERM=xterm-256color ssh'
 fi
+
+alias doom='~/.config/emacs/bin/doom'

@@ -15,11 +15,25 @@ vim.opt.rtp:prepend(lazypath)
 vim.g.mapleader = " "
 
 local themePlugin =
+  -- {
+  --   "shaunsingh/nord.nvim",
+  --   config = function()
+  --     vim.cmd("colorscheme nord")
+  --   end,
+  -- }
   {
-    "shaunsingh/nord.nvim",
+    "zenbones-theme/zenbones.nvim",
     config = function()
-      vim.cmd("colorscheme nord")
+      -- vim.cmd("colorscheme quiet")
+      vim.cmd("colorscheme zenbones")
+      -- vim.cmd("colorscheme zenwritten")
+      -- vim.cmd("colorscheme zenbones")
+      -- vim.cmd("colorscheme forestbones")
+      -- vim.cmd("colorscheme rosebones")
+      -- vim.cmd("colorscheme nordbones")
+      -- vim.cmd("colorscheme tokyobones")
     end,
+    dependencies = { { "rktjmp/lush.nvim" }, },
   }
   -- {
   --   "whatyouhide/vim-gotham",
@@ -76,13 +90,14 @@ require("lazy").setup({
       }
     },
   },
-  {
-    "nvim-treesitter/nvim-treesitter",
-    run = function()
-      local ts_update = require("nvim-treesitter.install").update({ with_sync = true })
-      ts_update()
-    end,
-  },
+  -- {
+  --   "nvim-treesitter/nvim-treesitter",
+  --   run = function()
+  --     local ts_update = require("nvim-treesitter.install").update({ with_sync = true })
+  --     ts_update()
+  --   end,
+  -- },
+  -- "nvim-treesitter/nvim-treesitter-context",
   "mbbill/undotree",
   themePlugin,
   {
@@ -108,7 +123,6 @@ require("lazy").setup({
       require("nvim-autopairs").setup({})
     end,
   },
-  "nvim-treesitter/nvim-treesitter-context",
   {
     "VonHeikemen/lsp-zero.nvim",
     dependencies = {

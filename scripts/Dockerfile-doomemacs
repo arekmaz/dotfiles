@@ -1,0 +1,17 @@
+FROM andreacorallo/emacs-nativecomp
+
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
+ENV TZ=Europe/Warsaw
+
+RUN apt-get update
+
+RUN apt install -y git ripgrep fd-find vim
+
+RUN git clone https://github.com/Karmenzind/monaco-nerd-fonts && mkdir -p /root/.local/share && cp -r monaco-nerd-fonts/fonts/ /root/.local/share/fonts && cp -r monaco-nerd-fonts/fonts/ /usr/share/fonts/monaco-nerd-fonts
+
+RUN git clone --depth 1 https://github.com/doomemacs/doomemacs /root/.config/emacs && /root/.config/emacs/bin/doom install --env --fonts --hooks -!
+
+RUN echo 'PATH=$PATH:/root/.config/emacs/bin' >> /root/.bashrc
+
+CMD ["tail", "-f", "/dev/null"]

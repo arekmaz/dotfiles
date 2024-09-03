@@ -4,8 +4,11 @@ export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # append unique commands to global history immediately
 shopt -s histappend
+# enable glob star expansion
+shopt -s globstar
 export HISTCONTROL=ignoreboth:erasedups
-# export PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
+# Force prompt to write history after every command.
+# http://superuser.com/questions/20900/bash-history-loss
 export PROMPT_COMMAND="history -a; history -c; history -r; $PROMPT_COMMAND"
 
 #Eternal bash history.
@@ -18,15 +21,6 @@ export HISTTIMEFORMAT="[%F %T] "
 # Change the file location because certain bash sessions truncate .bash_history file upon close.
 # http://superuser.com/questions/575479/bash-history-truncated-to-500-lines-on-each-login
 export HISTFILE=~/.bash_eternal_history
-# Force prompt to write history after every command.
-# http://superuser.com/questions/20900/bash-history-loss
-#PROMPT_COMMAND="history -a; $PROMPT_COMMAND"
-
-# set -o vi
-# bind 'set completion-ignore-case on'
-# bind 'TAB:menu-complete'
-# bind '"\e[Z":menu-complete-backward'
-# bind 'set show-all-if-ambiguous on'
 
 export PATH=/opt/homebrew/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin
 
@@ -39,13 +33,7 @@ esac
 
 export EDITOR='nvim'
 
-# alias ls='ls --color=auto'
-
 export PATH="$PATH:$HOME/scripts"
-export PATH="$PATH:/Library/TeX/texbin"
-
-export SB_HOME="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/me"
-alias sb='cd "$SB_HOME"'
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 
@@ -69,8 +57,7 @@ function show_user_host_if_remote() {
 
 # export PS1="\[\e[91m\]\$(parse_git_branch)\$(show_user_host_if_remote)\[\e[32m\][\w]\[\e[00m\]$ "
 # export PS1="\$(show_user_host_if_remote)\w$ "
-export PS1="\$(whoami)@$(hostname -s):\w$ "
-
+export PS1="\$(whoami)@$(hostname -s):\w\$(parse_git_branch)$ "
 
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"

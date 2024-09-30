@@ -5,6 +5,7 @@
 !.zshenv
 !.profile
 !.bashrc
+.bashrc.private
 !.hushlogin
 !.tmux.conf
 !.gitignore.defaults

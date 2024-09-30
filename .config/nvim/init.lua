@@ -24,6 +24,7 @@ local themePlugin =
   {
     "zenbones-theme/zenbones.nvim",
     config = function()
+      vim.g.zenbones = { transparent_background = true }
       -- vim.cmd("colorscheme quiet")
       vim.cmd("colorscheme zenbones")
       -- vim.cmd("colorscheme zenwritten")

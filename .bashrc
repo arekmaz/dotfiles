@@ -100,3 +100,9 @@ if [[ "$TERM" == "alacritty" ]]; then
 fi
 
 alias doom='~/.config/emacs/bin/doom'
+
+include () {
+      [[ -f "$1" ]] && source "$1"
+}
+
+include ".bashrc.private"

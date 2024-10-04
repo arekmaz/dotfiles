@@ -106,3 +106,4 @@ include () {
 }
 
 include ".bashrc.private"
+. "$HOME/.cargo/env"

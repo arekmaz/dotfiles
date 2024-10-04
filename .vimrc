@@ -1,16 +1,5 @@
 set nocompatible
 
-filetype plugin on
-
-augroup auto_compiler
-    autocmd!
-    autocmd FileType typescript compiler tsc
-    autocmd FileType typescript set makeprg=npx\ tsc
-
-    autocmd FileType typescriptreact compiler tsc
-    autocmd FileType typescriptreact set makeprg=npx\ tsc
-augroup END
-
 set ignorecase
 set incsearch
 set expandtab
@@ -24,6 +13,8 @@ set smarttab
 
 set undodir=~/.vim/undodir
 set undofile
+set noswapfile
+set nobackup
 
 set textwidth=80
 
@@ -38,7 +29,21 @@ set ttyfast
 
 set mouse=a
 
-set wildmenu
-
 set history=10000
+
+set wildmenu
+" trigger autocompletion with ctrl+n
+set wildchar=<C-n>
+
+
+"make incsearch highlight usable
+highlight Search ctermfg=white ctermbg=gray
+
+"make bprevious shortcut usable on mac [usually ctrl+(l|r) arrow]
+nnoremap <C-h> :bprevious<CR>
+nnoremap <C-l> :bnext<CR>
+
+" set error format to ts
+compiler tsc
+set makeprg=npx\ tsc
 

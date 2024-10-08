@@ -55,9 +55,19 @@ function show_user_host_if_remote() {
   fi
 }
 
+function show_hostname() {
+  
+  if [ -n "$TMUX" ]; then
+    echo "$(hostname -s)-tmux"
+  else
+    hostname -s
+  fi
+}
+
+
 # export PS1="\[\e[91m\]\$(parse_git_branch)\$(show_user_host_if_remote)\[\e[32m\][\w]\[\e[00m\]$ "
 # export PS1="\$(show_user_host_if_remote)\w$ "
-export PS1="\$(whoami)@$(hostname -s):\w\$(parse_git_branch)$ "
+export PS1="\$(whoami)@$(show_hostname):\w\$(parse_git_branch)$ "
 
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"

@@ -1,4 +1,6 @@
+colorscheme default
 set nocompatible
+set termguicolors
 
 set ignorecase
 set incsearch
@@ -12,7 +14,7 @@ set ruler
 set smarttab
 
 set undodir=~/.vim/undodir
-set undofile
+set noundofile
 set noswapfile
 set nobackup
 
@@ -35,9 +37,13 @@ set wildmenu
 " trigger autocompletion with ctrl+n
 set wildchar=<C-n>
 
+"visual mode highlight
+highlight Visual ctermbg=white ctermfg=Black guibg=white guifg=Black
 
-"make incsearch highlight usable
-highlight Search ctermfg=white ctermbg=gray
+highlight CursorLine ctermbg=white ctermfg=Black guibg=white guifg=Black
+
+"highlight search
+hi Search cterm=NONE ctermfg=white ctermbg=blue guibg=white guifg=Black
 
 "make bprevious shortcut usable on mac [usually ctrl+(l|r) arrow]
 nnoremap <C-h> :bprevious<CR>
@@ -47,3 +53,7 @@ nnoremap <C-l> :bnext<CR>
 compiler tsc
 set makeprg=npx\ tsc
 
+" ignore node_modules with builtin find
+set wildignore+=*/node_modules/*
+
+set path=**

@@ -38,14 +38,20 @@ vim.opt.updatetime = 50
 
 vim.opt.guicursor = "i:ver80-Cursor"
 
-vim.g.netrw_liststyle=3
+-- vim.g.netrw_liststyle=3
 
 vim.g.netrw_list_hide = ".*\\.swp$,.DS_Store,*/tmp/*,*.so,*.swp,*.zip,*.git,^\\.\\.\\=/\\=$"
 
-vim.g.netrw_preview = 1
+-- vim.g.netrw_preview = 1
 
 vim.g.history = 10000
 
+-- vim.opt.path = "**"
+
+vim.cmd [[
+  set wildchar=<C-n>
+  inoremap <Tab> <C-n>
+]]
 
 vim.opt.list = true
 vim.opt.laststatus = 0

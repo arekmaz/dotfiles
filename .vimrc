@@ -3,6 +3,7 @@ set nocompatible
 set termguicolors
 
 set ignorecase
+set smartcase
 set incsearch
 set expandtab
 set softtabstop=2
@@ -23,6 +24,8 @@ set textwidth=80
 set hlsearch
 set incsearch
 set linebreak
+set laststatus=0
+
 
 set wrapscan
 set wrap

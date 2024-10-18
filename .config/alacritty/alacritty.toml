@@ -1,5 +1,3 @@
-
-
 [font]
 size = 16
 
@@ -12,14 +10,22 @@ family = "Monaco Nerd Font"
 [window]
 decorations = "buttonless"
 # blur = true
-# opacity = 0.5
+# opacity = 0.79
+# opacity = 0.90
 option_as_alt = "Both"
+# startup_mode = "Maximized"
 
 [window.padding]
 x = 4
-y = 0
+y = 4
+
+[window.position]
+x = 4
+y = 4
 
 # [env]
 # necessary to support true color in tmux
 # TERM = "alacritty-direct"
 # TERM = "xterm-256color"
+# [shell]
+# program = "/opt/homebrew/bin/tmux"

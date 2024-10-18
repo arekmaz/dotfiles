@@ -14,82 +14,96 @@ vim.opt.rtp:prepend(lazypath)
 
 vim.g.mapleader = " "
 
-local themePlugin =
-  -- {
-  --   "shaunsingh/nord.nvim",
-  --   config = function()
-  --     vim.cmd("colorscheme nord")
-  --   end,
-  -- }
+local themePlugins = {
   {
     "zenbones-theme/zenbones.nvim",
     config = function()
       vim.g.zenbones = { transparent_background = true }
-      -- vim.cmd("colorscheme quiet")
       vim.cmd("colorscheme zenbones")
-      -- vim.cmd("colorscheme zenwritten")
-      -- vim.cmd("colorscheme zenbones")
-      -- vim.cmd("colorscheme forestbones")
+      -- vim.cmd("colorscheme vimbones")
       -- vim.cmd("colorscheme rosebones")
+      -- vim.cmd("colorscheme forestbones")
       -- vim.cmd("colorscheme nordbones")
       -- vim.cmd("colorscheme tokyobones")
+      -- vim.cmd("colorscheme seoulbones")
+      -- vim.cmd("colorscheme duckbones")
+      -- vim.cmd("colorscheme zenburned")
+      -- vim.cmd("colorscheme kanagawabones")
+      -- vim.cmd("colorscheme randombones")
     end,
     dependencies = { { "rktjmp/lush.nvim" }, },
+  },
+  {
+    "shaunsingh/nord.nvim",
+    config = function()
+      vim.cmd("colorscheme nord")
+    end,
+  },
+  {
+    "slugbyte/lackluster.nvim",
+    config = function()
+        -- vim.cmd.colorscheme("lackluster")
+        -- vim.cmd.colorscheme("lackluster-hack") -- my favorite
+        vim.cmd.colorscheme("lackluster-mint")
+    end,
+  },
+  {
+    "whatyouhide/vim-gotham",
+    config = function()
+      vim.cmd("colorscheme gotham")
+    end,
+  },
+  {
+    "neanias/everforest-nvim",
+    config = function()
+      require("everforest").setup({
+        sign_column_background = 'none'
+      })
+      vim.cmd("colorscheme everforest")
+    end,
+  },
+  {
+    "rebelot/kanagawa.nvim",
+    config = function()
+      vim.cmd("colorscheme kanagawa")
+    end,
+  },
+  {
+    "catppuccin/nvim",
+    config = function()
+      require("catppuccin").setup({
+        flavour = "latte",
+      -- flavour = "auto", -- latte, frappe, macchiato, mocha
+      });
+      vim.cmd("colorscheme catppuccin")
+    end,
+  },
+  {
+    "rose-pine/neovim",
+    config = function()
+      require("rose-pine").setup({
+        variant = "dawn",
+        -- variant = "auto", -- auto, main, moon, or dawn
+      });
+      vim.cmd("colorscheme rose-pine")
+    end,
   }
-  -- {
-  --   "whatyouhide/vim-gotham",
-  --   config = function()
-  --     vim.cmd("colorscheme gotham")
-  --   end,
-  -- }
-  -- {
-  --   "neanias/everforest-nvim",
-  --   config = function()
-  --     require("everforest").setup({
-  --       sign_column_background = 'none'
-  --     })
-  --     vim.cmd("colorscheme everforest")
-  --   end,
-  -- }
-  -- {
-  --   "rebelot/kanagawa.nvim",
-  --   config = function()
-  --     vim.cmd("colorscheme kanagawa")
-  --   end,
-  -- }
-  -- {
-  --   "catppuccin/nvim",
-  --   config = function()
-  --     require("catppuccin").setup({
-  --       flavour = "latte",
-  --     flavour = "auto", -- latte, frappe, macchiato, mocha
-  --     });
-  --     vim.cmd("colorscheme catppuccin")
-  --   end,
-  -- }
-  -- {
-  --   "rose-pine/neovim",
-  --   config = function()
-  --     require("rose-pine").setup({
-  --       variant = "dawn",
-  --       -- variant = "auto", -- auto, main, moon, or dawn
-  --     });
-  --     vim.cmd("colorscheme rose-pine")
-  --   end,
-  -- }
+}
+
+
+local themePlugin = themePlugins[1]
 
 require("lazy").setup({
-  "djoshea/vim-autoread",
-  {
-    "nvim-telescope/telescope.nvim",
-    tag = "0.1.5",
-    dependencies = { { "nvim-lua/plenary.nvim" },
-      { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
-      {
-        "nvim-telescope/telescope-file-browser.nvim",
-      }
-    },
-  },
+  -- {
+  --   "nvim-telescope/telescope.nvim",
+  --   tag = "0.1.5",
+  --   dependencies = { { "nvim-lua/plenary.nvim" },
+  --     { 'nvim-telescope/telescope-fzf-native.nvim', build = 'make' },
+  --     {
+  --       "nvim-telescope/telescope-file-browser.nvim",
+  --     }
+  --   },
+  -- },
   -- {
   --   "nvim-treesitter/nvim-treesitter",
   --   run = function()
@@ -98,31 +112,25 @@ require("lazy").setup({
   --   end,
   -- },
   -- "nvim-treesitter/nvim-treesitter-context",
-  "mbbill/undotree",
+  -- "mbbill/undotree",
   themePlugin,
-  {
-    "echasnovski/mini.nvim",
-    -- requires = {
-    --   "lewis6991/gitsigns.nvim"
-    -- },
-    config = function()
-      require("mini.surround").setup()
-      -- require("mini.align").setup()
-      -- require("mini.files").setup()
-      require("mini.comment").setup()
-      -- require("mini.indentscope").setup()
-      -- require("mini.jump").setup()
-      -- require("mini.jump2d").setup()
-      -- require("mini.statusline").setup()
-      -- require("mini.basics").setup()
-    end,
-  },
-  {
-    "windwp/nvim-autopairs",
-    config = function()
-      require("nvim-autopairs").setup({})
-    end,
-  },
+  -- {
+  --   "echasnovski/mini.nvim",
+  --   -- requires = {
+  --   --   "lewis6991/gitsigns.nvim"
+  --   -- },
+  --   config = function()
+  --     -- require("mini.surround").setup()
+  --     -- require("mini.align").setup()
+  --     -- require("mini.files").setup()
+  --     require("mini.comment").setup()
+  --     -- require("mini.indentscope").setup()
+  --     -- require("mini.jump").setup()
+  --     -- require("mini.jump2d").setup()
+  --     -- require("mini.statusline").setup()
+  --     -- require("mini.basics").setup()
+  --   end,
+  -- },
   {
     "VonHeikemen/lsp-zero.nvim",
     dependencies = {
@@ -154,9 +162,17 @@ require("lazy").setup({
   -- prettier
   "neovim/nvim-lspconfig",
   "jose-elias-alvarez/null-ls.nvim",
+  { "nvim-lua/plenary.nvim" },
   "MunifTanjim/prettier.nvim",
 
-  { "chrisgrieser/nvim-spider", lazy = true },
+  -- "djoshea/vim-autoread",
+  -- {
+  --   "windwp/nvim-autopairs",
+  --   config = function()
+  --     require("nvim-autopairs").setup({})
+  --   end,
+  -- },
+  -- { "chrisgrieser/nvim-spider", lazy = true },
 })
 
 require('arek')

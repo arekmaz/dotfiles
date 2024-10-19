@@ -163,9 +163,9 @@ require("lazy").setup({
   "neovim/nvim-lspconfig",
   "jose-elias-alvarez/null-ls.nvim",
   { "nvim-lua/plenary.nvim" },
-  "MunifTanjim/prettier.nvim",
+  -- "MunifTanjim/prettier.nvim",
 
-  -- "djoshea/vim-autoread",
+  "djoshea/vim-autoread",
   -- {
   --   "windwp/nvim-autopairs",
   --   config = function()

@@ -12,6 +12,7 @@ decorations = "buttonless"
 # blur = true
 # opacity = 0.79
 # opacity = 0.90
+opacity = 0.975
 option_as_alt = "Both"
 # startup_mode = "Maximized"
 

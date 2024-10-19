@@ -48,10 +48,9 @@ vim.g.history = 10000
 
 -- vim.opt.path = "**"
 
-vim.cmd [[
-  set wildchar=<C-n>
-  inoremap <Tab> <C-n>
-]]
+-- vim.cmd [[
+--   set wildchar=<C-n>
+-- ]]
 
 vim.opt.list = true
 vim.opt.laststatus = 0

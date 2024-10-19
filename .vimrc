@@ -37,8 +37,9 @@ set mouse=a
 set history=10000
 
 set wildmenu
+
 " trigger autocompletion with ctrl+n
-set wildchar=<C-n>
+"set wildchar=<C-n>
 
 "visual mode highlight
 highlight Visual ctermbg=white ctermfg=Black guibg=white guifg=Black
@@ -60,3 +61,6 @@ set makeprg=npx\ tsc
 set wildignore+=*/node_modules/*
 
 set path=**
+
+"set noshowcmd
+"set nomore

@@ -42,9 +42,9 @@ local on_attach = function(client, bufnr)
   vim.keymap.set("n", "gl", function() vim.diagnostic.open_float() end, opts)
   vim.keymap.set("n", "<leader>[", function() vim.diagnostic.goto_next() end, opts)
   vim.keymap.set("n", "<leader>]", function() vim.diagnostic.goto_prev() end, opts)
-  vim.keymap.set('n', 'gr', '<cmd>Telescope lsp_references<cr>', { buffer = bufnr })
-  vim.keymap.set('n', 'gd', '<cmd>Telescope lsp_definitions<cr>', { buffer = bufnr })
-  vim.keymap.set('n', 'gt', '<cmd>Telescope lsp_type_definitions<cr>', { buffer = bufnr })
+  -- vim.keymap.set('n', 'gr', '<cmd>Telescope lsp_references<cr>', { buffer = bufnr })
+  -- vim.keymap.set('n', 'gd', '<cmd>Telescope lsp_definitions<cr>', { buffer = bufnr })
+  -- vim.keymap.set('n', 'gt', '<cmd>Telescope lsp_type_definitions<cr>', { buffer = bufnr })
 
   vim.keymap.set('n', '<leader>org', organize_imports, { buffer = bufnr })
 

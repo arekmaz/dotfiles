@@ -3,6 +3,11 @@ vim.cmd([[
 set runtimepath^=~/.vim runtimepath+=~/.vim/after
 let &packpath = &runtimepath
 source ~/.vimrc
+
+
+"configs specific to nvim
+set grepprg=grep\ -n\ $*\ /dev/null
+set grepformat=%f:%l:%m,%f:%l%m,%f\ \ %l%m
 ]])
 
 

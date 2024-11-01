@@ -21,13 +21,13 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 local themePlugin = {
-    "zenbones-theme/zenbones.nvim",
-    config = function()
-      vim.g.zenbones = { transparent_background = true }
-      vim.cmd("colorscheme zenbones")
-    end,
-    dependencies = { { "rktjmp/lush.nvim" }, },
-  }
+  "zenbones-theme/zenbones.nvim",
+  config = function()
+    vim.g.zenbones = { transparent_background = true }
+    vim.cmd("colorscheme zenbones")
+  end,
+  dependencies = { { "rktjmp/lush.nvim" }, },
+}
 
 require("lazy").setup({
   themePlugin,
@@ -44,13 +44,9 @@ require("lazy").setup({
       { "hrsh7th/nvim-cmp" },
       { "hrsh7th/cmp-buffer" },
       { "hrsh7th/cmp-path" },
-      { "saadparwaiz1/cmp_luasnip" },
       { "hrsh7th/cmp-nvim-lsp" },
       { "hrsh7th/cmp-nvim-lua" },
     },
   },
-  "neovim/nvim-lspconfig",
-  "jose-elias-alvarez/null-ls.nvim",
-  { "nvim-lua/plenary.nvim" },
   "djoshea/vim-autoread",
 })

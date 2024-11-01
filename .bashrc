@@ -24,12 +24,15 @@ export HISTFILE=~/.bash_eternal_history
 
 export PATH=/opt/homebrew/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin
 
+
 export PATH="$PATH:/opt/homebrew/opt/libpq/bin"
 # Enable the subsequent settings only in interactive sessions
 case $- in
   *i*) ;;
     *) return;;
 esac
+
+export VIMRC="$HOME/.vimrc"
 
 export EDITOR='nvim'
 
@@ -57,11 +60,11 @@ function show_user_host_if_remote() {
 
 function show_hostname() {
   
-  if [ -n "$TMUX" ]; then
-    echo "$(hostname -s)-tmux"
-  else
+  #if [ -n "$TMUX" ]; then
+    #echo "$(hostname -s)-tmux"
+  #else
     hostname -s
-  fi
+  #fi
 }
 
 

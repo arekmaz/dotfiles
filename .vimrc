@@ -1,3 +1,4 @@
+let g:mapleader = " "
 set nocompatible
 set termguicolors
 
@@ -9,6 +10,9 @@ set incsearch
 set expandtab
 set softtabstop=2
 set updatetime=50
+
+"sign column off
+set scl=no
 
 set shiftwidth=2
 set smartindent
@@ -22,8 +26,6 @@ set undofile
 set noundofile
 set noswapfile
 set nobackup
-
-set textwidth=80
 
 set hlsearch
 set linebreak

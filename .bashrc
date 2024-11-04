@@ -24,6 +24,11 @@ export HISTFILE=~/.bash_eternal_history
 
 export PATH=/opt/homebrew/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin
 
+export PATH="$PATH:/opt/nvim-linux64/bin"
+export PATH="$PATH:/usr/local/plan9/bin"
+
+export FLYCTL_INSTALL="/home/arek/.fly"
+export PATH="$FLYCTL_INSTALL/bin:$PATH"
 
 export PATH="$PATH:/opt/homebrew/opt/libpq/bin"
 # Enable the subsequent settings only in interactive sessions
@@ -39,6 +44,7 @@ export EDITOR='nvim'
 export PATH="$PATH:$HOME/scripts"
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
+eval "$(fzf --bash)"
 
 export NVM_DIR="$HOME/.nvm"
 source "${NVM_DIR}/nvm.sh"
@@ -111,6 +117,7 @@ if [[ "$TERM" == "alacritty" ]]; then
   alias tmux='TERM=alacritty-direct $(which tmux)'
   alias ssh='TERM=xterm-256color ssh'
 fi
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 alias doom='~/.config/emacs/bin/doom'
 

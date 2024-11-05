@@ -8,7 +8,7 @@ size = 10
 family = "Monaco Nerd Font"
 
 [window]
-decorations = "buttonless"
+decorations = "none"
 # blur = true
 # opacity = 0.79
 # opacity = 0.90

@@ -26,6 +26,7 @@ export PATH=/opt/homebrew/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/
 
 export PATH="$PATH:/opt/nvim-linux64/bin"
 export PATH="$PATH:/usr/local/plan9/bin"
+export PATH="$PATH:/opt/zen"
 
 export FLYCTL_INSTALL="/home/arek/.fly"
 export PATH="$FLYCTL_INSTALL/bin:$PATH"

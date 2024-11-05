@@ -24,6 +24,9 @@ export HISTFILE=~/.bash_eternal_history
 
 export PATH=/opt/homebrew/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin
 
+# prepend scripts to be able to override the rest, setup wrappers, etc.
+export PATH="$HOME/scripts:$PATH"
+
 export PATH="$PATH:/opt/nvim-linux64/bin"
 export PATH="$PATH:/usr/local/plan9/bin"
 export PATH="$PATH:/opt/zen"
@@ -42,7 +45,6 @@ export VIMRC="$HOME/.vimrc"
 
 export EDITOR='nvim'
 
-export PATH="$PATH:$HOME/scripts"
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 eval "$(fzf --bash)"
@@ -109,6 +111,7 @@ __fzf_select__() {
 }
 
 alias fly_push='gwip && npm version patch && git push && fly deploy'
+alias ?=duck
 
 # bun
 export BUN_INSTALL="$HOME/.bun"

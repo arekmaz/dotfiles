@@ -30,3 +30,5 @@
 !/.config/zed/settings.json
 !/.config/zed/keymap.json
 
+!/.config/lynx
+!/.config/lynx/**

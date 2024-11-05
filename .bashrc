@@ -120,3 +120,32 @@ include () {
 
 include ".bashrc.private"
 . "$HOME/.cargo/env"
+
+
+function lynx() {
+  lynxpath="$(which lynx)"
+  useragent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_0) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.79 Safari/537.1 Lynx"
+
+  if [ -e "$HOME/.config/lynx/lynx.cfg" ];then
+    export LYNX_CFG="$HOME/.config/lynx/lynx.cfg"
+  fi
+
+  if [ -e "$HOME/.config/lynx/lynx.lss" ];then
+    export LYNX_LSS="$HOME/.config/lynx/lynx.lss"
+  fi
+
+  if [ ! -x "$lynxpath" ]; then
+    echo "Doesn't look like lynx is installed."
+    exit 1
+  fi
+
+  "$lynxpath" --useragent="$useragent" "$@"
+}
+
+function duck() {
+  lynx "https://lite.duckduckgo.com/lite?q=$*"
+}
+
+function duck!() {
+  lynx "https://lite.duckduckgo.com/lite?q=$*+!"
+}

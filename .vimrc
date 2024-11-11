@@ -37,6 +37,10 @@ set wrap
 
 set mouse=a
 
+if !has('nvim')
+  set ttymouse=sgr
+endif
+
 set history=10000
 
 "transparent background for all editor groups

@@ -31,26 +31,28 @@ local function select_ts_version()
 end
 
 local on_attach = function(client, bufnr)
+  -- https://lsp-zero.netlify.app/docs/language-server-configuration.html
   lsp.default_keymaps({ buffer = bufnr })
 
   local opts = { buffer = bufnr, remap = false }
 
-  vim.cmd('compiler tsc')
   vim.opt.makeprg = "npx tsc"
+  vim.cmd('compiler tsc')
 
-  vim.keymap.set("n", "gh", function() vim.lsp.buf.hover() end, opts)
-  vim.keymap.set("n", "gl", function() vim.diagnostic.open_float() end, opts)
+  vim.keymap.set("n", "<leader>l", function() vim.diagnostic.open_float() end, opts)
+
   vim.keymap.set("n", "<leader>[", function() vim.diagnostic.goto_next() end, opts)
+
   vim.keymap.set("n", "<leader>]", function() vim.diagnostic.goto_prev() end, opts)
-  -- vim.keymap.set('n', 'gr', '<cmd>Telescope lsp_references<cr>', { buffer = bufnr })
-  -- vim.keymap.set('n', 'gd', '<cmd>Telescope lsp_definitions<cr>', { buffer = bufnr })
-  -- vim.keymap.set('n', 'gt', '<cmd>Telescope lsp_type_definitions<cr>', { buffer = bufnr })
 
-  vim.keymap.set('n', '<leader>org', organize_imports, { buffer = bufnr })
+  vim.keymap.set('n', '<leader>o', organize_imports, { buffer = bufnr })
 
-  vim.keymap.set('n', '<leader>sel', select_ts_version, { buffer = bufnr })
+  vim.keymap.set('n', '<leader>s', select_ts_version, { buffer = bufnr })
 
   vim.keymap.set("n", "<leader>.", function() vim.lsp.buf.code_action() end, opts)
+
+  vim.keymap.set("n", "<leader>r", function() vim.lsp.buf.rename() end, opts)
+
   if vim.lsp.buf.range_code_action then
     vim.keymap.set('x', '<leader>.', '<cmd>lua vim.lsp.buf.range_code_action()<cr>',{ buffer = bufnr })
   else
@@ -58,7 +60,6 @@ local on_attach = function(client, bufnr)
   end
 
 
-  vim.keymap.set("n", "<leader>rn", function() vim.lsp.buf.rename() end, opts)
 end
 
 lsp.on_attach(on_attach)
@@ -74,12 +75,8 @@ require('mason-lspconfig').setup({
     lsp.default_setup,
   },
   opts = {
-      ensure_installed = {
-        "eslint-lsp@4.8.0",
-        'vtsls'
-      },
-      automatic_installation = true
-    },
+    automatic_installation = true
+  },
 })
 
 lsp.setup_servers({

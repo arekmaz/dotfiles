@@ -118,7 +118,7 @@ include () {
       [[ -f "$1" ]] && source "$1"
 }
 
-include ".bashrc.private"
+include "$HOME/.bashrc.private"
 . "$HOME/.cargo/env"
 
 

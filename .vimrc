@@ -37,9 +37,6 @@ set wrap
 
 set mouse=a
 
-if !has('nvim')
-  set ttymouse=sgr
-endif
 
 set history=10000
 
@@ -92,9 +89,15 @@ highlight Search cterm=NONE ctermfg=white ctermbg=blue guibg=white guifg=Black
 nnoremap <C-h> :bprevious<CR>
 nnoremap <C-l> :bnext<CR>
 
-" set error format to ts
-autocmd FileType typescript compiler tsc
-autocmd FileType typescript set makeprg=npx\ tsc
 
 " ignore node_modules with builtin find
 set wildignore+=*/node_modules/*
+
+" vim only
+if !has('nvim')
+  set ttymouse=sgr
+
+  " set error format to ts
+  autocmd FileType typescript compiler tsc
+  autocmd FileType typescript set makeprg=npx\ tsc
+endif

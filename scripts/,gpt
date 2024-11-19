@@ -16,7 +16,6 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-PROMPT="$*"
 stdin=''
 
 if [ ! -t 0 ]; then
@@ -26,23 +25,21 @@ fi
 # engine='gpt-3.5-turbo'
 engine='gpt-4o'
 
+args="$*"
+
 history_file="$HOME/.gpt-history"
 last_gpt_answer_file="$HOME/.gpt-last-conv"
 
-input=$(jq -Rn --arg input "$*
-$stdin" '$input')
+data=$(jq -Rn --arg input "$args $stdin" '{
+    "model": "'"$engine"'",
+    "messages": [{"role": "user", "content": $input}]
+  }')
 
-echo "$input" >> $history_file
+echo "$data" >> $history_file
 echo "" >> $history_file
 
-echo "$input" > $last_gpt_answer_file
+echo "$data" > $last_gpt_answer_file
 echo "" >> $last_gpt_answer_file
-
-data=$(jq -Rn --arg input "$*
-$stdin" '{
-    "model": "'"$engine"'",
-    "messages": [{"role": "user", "content": '"$input"'}]
-  }')
 
 output=$(curl -s https://api.openai.com/v1/chat/completions \
   -H "Authorization: Bearer $API_KEY" \

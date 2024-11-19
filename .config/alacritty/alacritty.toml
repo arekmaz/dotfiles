@@ -16,7 +16,7 @@ decorations = "buttonless"
 # blur = true
 # opacity = 0.79
 # opacity = 0.90
-opacity = 0.975
+opacity = 0.8
 #option_as_alt = "Both" # breaks "polish" signs
 # startup_mode = "Maximized"
 
@@ -25,12 +25,12 @@ x = 6
 y = 4
 
 [window.position]
-x = 40
-y = 40
+x = 0
+y = 0
 
 [window.dimensions]
-columns = 132
-lines = 36
+columns = 136
+lines = 40
 
 # [env]
 # necessary to support true color in tmux

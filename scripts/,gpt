@@ -1,0 +1,45 @@
+# chatgpt.sh
+#!/bin/bash
+
+keyfile="$HOME/.chatgpt-key"
+
+if [ ! -f "$keyfile" ]; then
+    echo "Error: File '$keyfile' does not exist."
+    exit 1
+fi
+
+API_KEY="$(cat $keyfile)"
+
+if [ $# -eq 0 ]; then
+    echo "Error: No arguments provided."
+    echo "Usage: ,gpt <arg1> [arg2 ...]"
+    exit 1
+fi
+
+PROMPT="$*"
+
+engine='gpt-3.5-turbo'
+
+history_file="$HOME/.gpt-history"
+last_gpt_answer_file="$HOME/.gpt-last-conv"
+
+echo "$PROMPT" > $history_file
+echo "" >> $history_file
+
+echo "$PROMPT" > $last_gpt_answer_file
+echo "" >> $last_gpt_answer_file
+
+curl -s https://api.openai.com/v1/chat/completions \
+  -H "Authorization: Bearer $API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "'"$engine"'",
+    "messages": [{"role": "user", "content": "'"$PROMPT"'"}]
+  }' | jq -r '.choices[0].message.content' | tee -a $history_file | tee -a $last_gpt_answer_file
+
+echo "" >> $history_file
+echo "" >> $last_gpt_answer_file
+echo "" >> $history_file
+echo "" >> $last_gpt_answer_file
+
+

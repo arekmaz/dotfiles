@@ -18,8 +18,11 @@ git config --global core.excludesFile '~/.gitignore.defaults'
 
 # exit the shell or run: `source ~/.bashrc`
 
-# from now on you can use the `dot` script as a replacement for `git` command for dotfiles
-# alternatively you can use the `lazydot` if you have [lazygit](https://github.com/jesseduffield/lazygit) installed
+# from now on you can use the `,dot` script as a replacement for `git` command for dotfiles
+# alternatively you can use the `,lazydot` if you have [lazygit](https://github.com/jesseduffield/lazygit) installed
+
+
+# All my scripts are prefixed with `,` for an easier separation from other programs.
 ```
 
 

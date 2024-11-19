@@ -22,8 +22,10 @@ if [ ! -t 0 ]; then
     stdin="$(cat)"  # Read all stdin into the variable
 fi
 
-# engine='gpt-3.5-turbo'
-engine='gpt-4o'
+# model='gpt-3.5-turbo'
+default_model='gpt-4o'
+model="${GPT_MODEL:-$default_model}"
+
 
 args="$*"
 
@@ -31,7 +33,7 @@ history_file="$HOME/.gpt-history"
 last_gpt_answer_file="$HOME/.gpt-last-conv"
 
 data=$(jq -Rn --arg input "$args $stdin" '{
-    "model": "'"$engine"'",
+    "model": "'"$model"'",
     "messages": [{"role": "user", "content": $input}]
   }')
 
@@ -48,8 +50,8 @@ output=$(curl -s https://api.openai.com/v1/chat/completions \
 
 resp=$(echo "$output" | jq -r '.choices[0].message.content')
 
-if [ -z "$resp" ]; then
-    echo $resp
+if [ "$resp" = "null" ]; then
+    echo "$output"
     exit 1
 fi
 

@@ -17,29 +17,48 @@ if [ $# -eq 0 ]; then
 fi
 
 PROMPT="$*"
+stdin=''
 
-engine='gpt-3.5-turbo'
+if [ ! -t 0 ]; then
+    stdin="$(cat)"  # Read all stdin into the variable
+fi
+
+# engine='gpt-3.5-turbo'
+engine='gpt-4o'
 
 history_file="$HOME/.gpt-history"
 last_gpt_answer_file="$HOME/.gpt-last-conv"
 
-echo "$PROMPT" > $history_file
+input=$(jq -Rn --arg input "$*
+$stdin" '$input')
+
+echo "$input" >> $history_file
 echo "" >> $history_file
 
-echo "$PROMPT" > $last_gpt_answer_file
+echo "$input" > $last_gpt_answer_file
 echo "" >> $last_gpt_answer_file
 
-curl -s https://api.openai.com/v1/chat/completions \
+data=$(jq -Rn --arg input "$*
+$stdin" '{
+    "model": "'"$engine"'",
+    "messages": [{"role": "user", "content": '"$input"'}]
+  }')
+
+output=$(curl -s https://api.openai.com/v1/chat/completions \
   -H "Authorization: Bearer $API_KEY" \
   -H "Content-Type: application/json" \
-  -d '{
-    "model": "'"$engine"'",
-    "messages": [{"role": "user", "content": "'"$PROMPT"'"}]
-  }' | jq -r '.choices[0].message.content' | tee -a $history_file | tee -a $last_gpt_answer_file
+  -d "$data")
+
+resp=$(echo "$output" | jq -r '.choices[0].message.content')
+
+if [ -z "$resp" ]; then
+    echo $resp
+    exit 1
+fi
+
+echo "$resp" | tee -a $history_file | tee -a $last_gpt_answer_file
 
 echo "" >> $history_file
-echo "" >> $last_gpt_answer_file
 echo "" >> $history_file
-echo "" >> $last_gpt_answer_file
 
 

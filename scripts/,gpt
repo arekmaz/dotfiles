@@ -1,4 +1,3 @@
-# chatgpt.sh
 #!/bin/bash
 
 keyfile="$HOME/.chatgpt-key"

@@ -58,5 +58,3 @@ echo "$resp" | tee -a $history_file | tee -a $last_gpt_answer_file
 
 echo "" >> $history_file
 echo "" >> $history_file
-
-

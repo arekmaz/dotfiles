@@ -15,8 +15,8 @@ family = "Monaco Nerd Font"
 decorations = "buttonless"
 # blur = true
 # opacity = 0.79
-# opacity = 0.90
-opacity = 0.8
+opacity = 0.97
+# opacity = 0.93
 #option_as_alt = "Both" # breaks "polish" signs
 # startup_mode = "Maximized"
 

@@ -37,6 +37,7 @@ export VIMRC="$HOME/.vimrc"
 export EDITOR='nvim'
 
 export PATH="$PATH:$HOME/scripts"
+export PATH="$PATH:$HOME/scripts/bun/bin"
 
 [ -f ~/.fzf.bash ] && source ~/.fzf.bash
 

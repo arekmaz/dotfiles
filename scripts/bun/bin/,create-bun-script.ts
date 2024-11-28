@@ -11,6 +11,7 @@ import {
   BunRuntime,
   BunCommandExecutor,
   BunFileSystem,
+  BunContext
 } from "@effect/platform-bun";
 
 Effect.gen(function* () {
@@ -65,8 +66,6 @@ console.log("hello from ${filePath}")
 
   yield* terminal.display(`created a bun script ${filePath}\n`);
 }).pipe(
-  Effect.provide(BunTerminal.layer),
-  Effect.provide(BunCommandExecutor.layer),
-  Effect.provide(BunFileSystem.layer),
+  Effect.provide(BunContext.layer),
   BunRuntime.runMain,
 );

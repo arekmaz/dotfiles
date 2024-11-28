@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@effect/cli": "^0.48.28",
     "@effect/platform": "^0.69.28",
     "@effect/platform-bun": "^0.49.30",
     "@types/bun": "^1.1.14",

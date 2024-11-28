@@ -1,8 +1,13 @@
 #!/usr/bin/env bun
 import { Effect } from 'effect'
 import { BunContext, BunRuntime } from '@effect/platform-bun'
+import { FetchHttpClient } from "@effect/platform";
 
 import { cli } from "../src/monolith";
 
 // Prepare and run the CLI application
-cli(process.argv).pipe(Effect.provide(BunContext.layer), BunRuntime.runMain)
+cli(process.argv).pipe(
+  Effect.provide(BunContext.layer),
+  Effect.provide(FetchHttpClient.layer),
+  BunRuntime.runMain
+)

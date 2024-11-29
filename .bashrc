@@ -150,3 +150,5 @@ function duck() {
 function duck!() {
   lynx "https://lite.duckduckgo.com/lite?q=$*+!"
 }
+
+eval "$(,m --completions bash)"

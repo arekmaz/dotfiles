@@ -1,18 +1,12 @@
 #!/usr/bin/env bun
-import { Effect, Schema } from "effect";
 import {
-  Terminal,
-  FileSystem,
-  CommandExecutor,
   Command,
+  CommandExecutor,
+  FileSystem,
+  Terminal,
 } from "@effect/platform";
-import {
-  BunTerminal,
-  BunRuntime,
-  BunCommandExecutor,
-  BunFileSystem,
-  BunContext
-} from "@effect/platform-bun";
+import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { Effect, Schema } from "effect";
 
 Effect.gen(function* () {
   const terminal = yield* Terminal.Terminal;
@@ -33,7 +27,6 @@ Effect.gen(function* () {
 
   const fs = yield* FileSystem.FileSystem;
 
-  // @ts-expect-error esnext breaks typing for some reason
   const filePath = import.meta.dir + "/" + name;
 
   yield* fs.writeFileString(
@@ -59,13 +52,10 @@ console.log("hello from ${filePath}")
           }).exited,
       ),
     ),
-    Effect.scoped
+    Effect.scoped,
   );
 
   yield* fs.chmod(filePath, 0o777);
 
   yield* terminal.display(`created a bun script ${filePath}\n`);
-}).pipe(
-  Effect.provide(BunContext.layer),
-  BunRuntime.runMain,
-);
+}).pipe(Effect.provide(BunContext.layer), BunRuntime.runMain);

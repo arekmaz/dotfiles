@@ -68,7 +68,8 @@ export const gpt = Command.make(
 
       const stdin = yield* readStdin;
 
-      const content = `${codeOnly ? "output just valid code:\n" : ""}${prompt.concat([stdin]).join(" ")}`
+      const content = `${codeOnly ? "output just valid code:\n" : ""}
+      ${prompt.concat([stdin]).join(" ")}`
 
       const data = { model, messages: [{ role: "user", content }] };
 

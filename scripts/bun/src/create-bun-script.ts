@@ -1,4 +1,3 @@
-#!/usr/bin/env bun
 import {
   Command,
   CommandExecutor,
@@ -27,12 +26,19 @@ Effect.gen(function* () {
 
   const fs = yield* FileSystem.FileSystem;
 
-  const filePath = import.meta.dir + "/" + name;
+  const binFilePath = import.meta.dir + "/../bin/" + name;
+  const srcFilePath = import.meta.dir + "/../src/" + name + '.tsx'
 
   yield* fs.writeFileString(
-    filePath,
-    `#!/usr/bin/env bun\n
-console.log("hello from ${filePath}")
+    binFilePath,
+    `#!/usr/bin/env bun
+import "../src/${name}.tsx";
+`,
+  );
+
+  yield* fs.writeFileString(
+    srcFilePath,
+    `console.log("hello from ${srcFilePath}")
 `,
   );
 
@@ -44,7 +50,7 @@ console.log("hello from ${filePath}")
       Effect.promise(
         () =>
           Bun.spawn({
-            cmd: [editorCmd, filePath],
+            cmd: [editorCmd, srcFilePath],
             stdin: "pipe",
             stdout: "pipe",
             stderr: "pipe",
@@ -55,7 +61,8 @@ console.log("hello from ${filePath}")
     Effect.scoped,
   );
 
-  yield* fs.chmod(filePath, 0o777);
+  yield* fs.chmod(binFilePath, 0o777);
 
-  yield* terminal.display(`created a bun script ${filePath}\n`);
+  yield* terminal.display(`created a bun script ${binFilePath}\n`);
+  yield* terminal.display(`created a bun src file ${srcFilePath}\n`);
 }).pipe(Effect.provide(BunContext.layer), BunRuntime.runMain);

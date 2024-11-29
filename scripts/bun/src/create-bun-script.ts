@@ -6,6 +6,7 @@ import {
 } from "@effect/platform";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { Effect, Schema } from "effect";
+import { editor } from "../interactiveShell.js";
 
 Effect.gen(function* () {
   const terminal = yield* Terminal.Terminal;
@@ -42,24 +43,7 @@ import "../src/${name}.tsx";
 `,
   );
 
-  const editorCmd = Bun.env.EDITOR || "vi";
-
-  // run $EDITOR on the new file
-  yield* fs.open("/dev/tty", { flag: "r" }).pipe(
-    Effect.flatMap((keyboardStream) =>
-      Effect.promise(
-        () =>
-          Bun.spawn({
-            cmd: [editorCmd, srcFilePath],
-            stdin: "pipe",
-            stdout: "pipe",
-            stderr: "pipe",
-            stdio: [keyboardStream.fd, 1, 2],
-          }).exited,
-      ),
-    ),
-    Effect.scoped,
-  );
+  yield* editor(srcFilePath)
 
   yield* fs.chmod(binFilePath, 0o777);
 

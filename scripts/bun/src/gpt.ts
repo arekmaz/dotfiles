@@ -47,7 +47,7 @@ export const gpt = Command.make(
 
       const content = `${
         codeOnly
-          ? `you will loose points if you output anything else than valid code:
+          ? `you will loose points if you output anything else than minimal valid working code:
 
 `
           : ""
@@ -56,12 +56,10 @@ export const gpt = Command.make(
       let responseContent = yield* gptPrompt(content, { model, keyfile });
 
       if (
-        responseContent.startsWith("```") &&
-        responseContent.endsWith("```")
+        codeOnly
       ) {
         responseContent = responseContent
-          .replace(/```.*\n/, "")
-          .replace(/\n```/, "");
+        .replace(/[\s\S]*```.+\n/, "").replace(/```[\s\S]*/, '')
       }
 
       yield* Console.log(responseContent);

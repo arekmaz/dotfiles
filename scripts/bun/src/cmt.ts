@@ -168,7 +168,7 @@ const getCommentedLines = (lines: string[], filename: string) =>
       return lines.map(wrappingComment("/" + "*", "*/", true));
     }
 
-    if ([".html"].some((ext) => filename.endsWith(ext))) {
+    if ([".html", '.md'].some((ext) => filename.endsWith(ext))) {
       return lines.map(wrappingComment("<!--", "-->", true));
     }
 
@@ -232,6 +232,9 @@ function commentJsxLines(
     selectedLineTypes.length === lines.length,
     "could not match type info for every passed line",
   );
+
+  // TODO: technically only the type of the first line is needed,
+  // maybe optimize the algorighm:
 
   // comment all as jsx if the first line is jsx
   if (selectedLineTypes[0] === 'jsx') {
@@ -338,7 +341,7 @@ function getJsxLineTypes(fileContent: string) {
       return;
     }
 
-    // choose the node that starts earlier, (towards the column start)
+    // choose the node that starts earlier, (towards the row start)
     if (currentOnIndex.column > lineType.column) {
       lineTypes[line] = lineType;
       ts.forEachChild(node, analyzeNode);

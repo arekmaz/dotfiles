@@ -148,6 +148,8 @@ const commentLine = (
   };
 
   // TODO: jsx block aware comments
+  // TODO: ignore if line already commented?
+  // TODO: uncomment
   if (
     [".js", ".jsx", ".json", ".ts", ".tsx", ".go", ".rs"].some((ext) =>
       filename.endsWith(ext),

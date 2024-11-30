@@ -183,6 +183,10 @@ const getCommentedLines = (lines: string[], filename: string) =>
     const fileContents = yield* fs.readFileString(filename);
     const firstLine = splitNewline(fileContents)[0];
 
+    if ([".jsx", ".tsx"].some((ext) => filename.endsWith(ext))) {
+      return commentJsxLines(fileContents, lines, indChar, indCount);
+    }
+
     if (!firstLine.startsWith("#!/")) {
       return lines.map(prependCommentPrefix("/" + "/"));
     }
@@ -195,10 +199,6 @@ const getCommentedLines = (lines: string[], filename: string) =>
       return lines.map(prependCommentPrefix("/" + "/"));
     }
 
-    if ([".jsx", ".tsx"].some((ext) => filename.endsWith(ext))) {
-      return commentJsxLines(fileContents, lines, indChar, indCount);
-    }
-
     return lines.map(prependCommentPrefix("--"));
   });
 
@@ -209,14 +209,32 @@ function commentJsxLines(
   indCount: number,
 ) {
   const jsxLineTypes = getJsxLineTypes(fileContent);
+  const fileLines = splitNewline(fileContent);
 
   invariant(
-    jsxLineTypes.length === lines.length,
-    `got ${lines.length} lines and ${jsxLineTypes.length} line types, they should be equal`,
+    jsxLineTypes.length === fileLines.length,
+    "could not find a type for every line",
   );
 
-  // if all lines are jsx comment them like so
-  if (jsxLineTypes.every((t) => t === "jsx")) {
+  const selectedLinesStartFromIndex = findRangeStartingIndex(lines, fileLines);
+
+  invariant(
+    selectedLinesStartFromIndex !== null,
+    "could not place selected lines in the file",
+  );
+
+  const selectedLineTypes = jsxLineTypes.slice(
+    selectedLinesStartFromIndex,
+    selectedLinesStartFromIndex + lines.length,
+  );
+
+  invariant(
+    selectedLineTypes.length === lines.length,
+    "could not match type info for every passed line",
+  );
+
+  // comment all as jsx if the first line is jsx
+  if (selectedLineTypes[0] === 'jsx') {
     return lines.map((line) => {
       if (isLineEmpty(line)) {
         return line;
@@ -228,7 +246,7 @@ function commentJsxLines(
     });
   }
 
-  // treat mixed lines as all ts
+  // treat the rest as ts
   return lines.map((line) => {
     if (isLineEmpty(line)) {
       return line;
@@ -275,6 +293,9 @@ function getJsxLineTypes(fileContent: string) {
 
     const parentNode = node.parent;
 
+    const isJsx = (n: ts.Node) => 
+        ts.isJsxElement(n) || ts.isJsxSelfClosingElement(n) || ts.isJsxChild(n)
+
     const lineType: LineTypeInfo = {
       position: "start", // default
       line,
@@ -284,11 +305,11 @@ function getJsxLineTypes(fileContent: string) {
       columnEnd,
       parentText: node.getText(),
       type:
-        ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node)
+        isJsx(node)
           ? "jsx"
           : "typescript",
       parent: parentNode
-        ? ts.isJsxElement(parentNode) || ts.isJsxSelfClosingElement(parentNode)
+        ? isJsx(parentNode)
           ? "jsx"
           : "typescript"
         : null,
@@ -339,7 +360,35 @@ function getJsxLineTypes(fileContent: string) {
 
   analyzeNode(sourceFile);
 
-  return lineTypes.map((t) =>
-    t.type === "jsx" && t.parent === "jsx" ? "jsx" : "typescript",
-  );
+  return splitNewline(fileContent).map((_, i) => {
+    const t = lineTypes[i];
+
+    if (!t) {
+      return "jsx";
+    }
+
+    return t.parent === "jsx" ? "jsx" : "typescript";
+  });
+}
+
+function findRangeStartingIndex<T>(needle: T[], haystack: T[]) {
+  let result = null;
+
+  for (let i = 0; i < haystack.length; ++i) {
+    if (result !== null && i - result >= needle.length) {
+      return result;
+    }
+
+    if (needle[0] === haystack[i] && result === null) {
+      result = i;
+      continue;
+    }
+
+    if (result !== null && haystack[i] !== needle[i - result]) {
+      result = null;
+      continue;
+    }
+  }
+
+  return result;
 }

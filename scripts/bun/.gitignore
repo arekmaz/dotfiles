@@ -1,3 +1,5 @@
 /node_modules
 /dist
-/bin/,m # built executable
+
+# single executable build
+/bin/,m

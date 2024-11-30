@@ -6,8 +6,16 @@ vim.cmd([[
 
 
   "configs specific to nvim
+
+  "restore the default vim grepprg
   set grepprg=grep\ -n\ $*\ /dev/null
   set grepformat=%f:%l:%m,%f:%l%m,%f\ \ %l%m
+
+  "diable gc commenting, vim doesn't have it
+  ounmap gc
+  nunmap gc
+  xunmap gc
+  nunmap gcc
 ]])
 
 

@@ -148,6 +148,10 @@ export const getCommentedLines = (lines: string[], filename: string) =>
       return lines.map(prependCommentPrefix("--"));
     }
 
+    if ([".lua"].some((ext) => filename.endsWith(ext))) {
+      return lines.map(prependCommentPrefix('"'));
+    }
+
     if (
       [".sh", ".bash", ".yml", ".yaml", ".toml"].some((ext) =>
         filename.endsWith(ext),

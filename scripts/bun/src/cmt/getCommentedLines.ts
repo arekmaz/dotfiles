@@ -115,35 +115,62 @@ export const getCommentedLines = (lines: string[], filename: string) =>
       };
 
     if (
-      [".js", ".json", ".ts", ".go", ".rs"].some((ext) =>
-        filename.endsWith(ext),
-      )
+      [
+        ".js",
+        ".cjs",
+        ".mjs",
+        ".ts",
+        ".mts",
+        ".cts",
+
+        ".json",
+        ".c",
+        ".cpp",
+        ".json5",
+        ".go",
+        ".rs",
+      ].some((ext) => filename.endsWith(ext))
     ) {
       return lines.map(prependCommentPrefix("/" + "/"));
     }
 
-    if ([".css"].some((ext) => filename.endsWith(ext))) {
+    if ([".css", ".scss", ".sass"].some((ext) => filename.endsWith(ext))) {
       return lines.map(wrappingComment("/" + "*", "*/", true));
     }
 
-    if ([".html", ".md"].some((ext) => filename.endsWith(ext))) {
+    if (
+      [".html", ".md", ".svelte", ".vue"].some((ext) => filename.endsWith(ext))
+    ) {
       return lines.map(wrappingComment("<!--", "-->", true));
     }
 
-    if ([".hs"].some((ext) => filename.endsWith(ext))) {
+    if ([".hs", ".sql"].some((ext) => filename.endsWith(ext))) {
       return lines.map(prependCommentPrefix("--"));
     }
 
-    if ([/\b(bashrc|zshrc)\b/].some((re) => re.test(filename))) {
+    if (
+      [".sh", ".bash", ".yml", ".yaml", ".toml"].some((ext) =>
+        filename.endsWith(ext),
+      )
+    ) {
+      return lines.map(prependCommentPrefix("#"));
+    }
+
+    if (
+      [/\b(bashrc|zshrc|vimrc|gitignore|Dockerfile|Makefile)\b/].some((re) =>
+        re.test(filename),
+      )
+    ) {
       return lines.map(prependCommentPrefix("#"));
     }
 
     const fileContents = yield* fs.readFileString(filename);
-    const firstLine = splitNewline(fileContents)[0];
 
     if ([".jsx", ".tsx"].some((ext) => filename.endsWith(ext))) {
       return commentJsxLines(fileContents, lines, indChar, indCount);
     }
+
+    const firstLine = splitNewline(fileContents)[0];
 
     if (!firstLine.startsWith("#!/")) {
       return lines.map(prependCommentPrefix("/" + "/"));

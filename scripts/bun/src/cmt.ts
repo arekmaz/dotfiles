@@ -123,8 +123,6 @@ const getCommentedLines = (lines: string[], filename: string) =>
 
     const fs = yield* FileSystem.FileSystem;
 
-    const fileContents = yield* fs.readFileString(filename);
-
     const indChar = lowestIndentation.type === "space" ? " " : "\t";
 
     const indCount =
@@ -136,6 +134,7 @@ const getCommentedLines = (lines: string[], filename: string) =>
         if (omitEmpty && isLineEmpty(line)) {
           return line;
         }
+
         const result =
           indChar.repeat(indCount) + cmt + " " + line.slice(indCount);
         return result;
@@ -158,7 +157,7 @@ const getCommentedLines = (lines: string[], filename: string) =>
       };
 
     if (
-      [".js", ".jsx", ".json", ".ts", ".tsx", ".go", ".rs"].some((ext) =>
+      [".js", ".json", ".ts", ".go", ".rs"].some((ext) =>
         filename.endsWith(ext),
       )
     ) {
@@ -181,6 +180,7 @@ const getCommentedLines = (lines: string[], filename: string) =>
       return lines.map(prependCommentPrefix("#"));
     }
 
+    const fileContents = yield* fs.readFileString(filename);
     const firstLine = splitNewline(fileContents)[0];
 
     if (!firstLine.startsWith("#!/")) {
@@ -195,8 +195,50 @@ const getCommentedLines = (lines: string[], filename: string) =>
       return lines.map(prependCommentPrefix("/" + "/"));
     }
 
+    if ([".jsx", ".tsx"].some((ext) => filename.endsWith(ext))) {
+      return commentJsxLines(fileContents, lines, indChar, indCount);
+    }
+
     return lines.map(prependCommentPrefix("--"));
   });
+
+function commentJsxLines(
+  fileContent: string,
+  lines: string[],
+  indChar: string,
+  indCount: number,
+) {
+  const jsxLineTypes = getJsxLineTypes(fileContent);
+
+  invariant(
+    jsxLineTypes.length === lines.length,
+    `got ${lines.length} lines and ${jsxLineTypes.length} line types, they should be equal`,
+  );
+
+  // if all lines are jsx comment them like so
+  if (jsxLineTypes.every((t) => t === "jsx")) {
+    return lines.map((line) => {
+      if (isLineEmpty(line)) {
+        return line;
+      }
+
+      const result =
+        indChar.repeat(indCount) + "{/* " + line.slice(indCount) + " */}";
+      return result;
+    });
+  }
+
+  // treat mixed lines as all ts
+  return lines.map((line) => {
+    if (isLineEmpty(line)) {
+      return line;
+    }
+
+    const result = indChar.repeat(indCount) + "// " + line.slice(indCount);
+
+    return result;
+  });
+}
 
 function getJsxLineTypes(fileContent: string) {
   // from chatgpt - tsx, jsx parsing
@@ -301,18 +343,3 @@ function getJsxLineTypes(fileContent: string) {
     t.type === "jsx" && t.parent === "jsx" ? "jsx" : "typescript",
   );
 }
-
-// Example Usage
-const tsxContent = `const value = 42;
-const element = <div>Hello, world!</div>;
-function App() {
-  return <h1>
-  <div>
-  {value}
-  </div>
-  </h1>;
-}
-`;
-
-const result = getJsxLineTypes(tsxContent);
-console.log(result);

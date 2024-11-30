@@ -111,8 +111,6 @@ const getLowestIndentation = (lines: string[]) => {
   return lowestIndentation;
 };
 
-type LowestIndentation = ReturnType<typeof getLowestIndentation>;
-
 const splitNewline = (s: string) => s.split(/\r?\n/);
 
 const isLineEmpty = (line: string) => /^( |\t)*$/.test(line);
@@ -122,93 +120,97 @@ const getCommentedLines = (lines: string[], filename: string) =>
     const lowestIndentation = getLowestIndentation(
       lines.filter((line) => !isLineEmpty(line)),
     );
+
     const fs = yield* FileSystem.FileSystem;
 
     const fileContents = yield* fs.readFileString(filename);
 
-    return lines.map((line) =>
-      commentLine(line, filename, lines, lowestIndentation, fileContents),
-    );
-  });
+    const indChar = lowestIndentation.type === "space" ? " " : "\t";
 
-const commentLine = (
-  line: string,
-  filename: string,
-  lines: string[],
-  lowestIndentation: LowestIndentation,
-  fileContents: string,
-) => {
-  const indChar = lowestIndentation.type === "space" ? " " : "\t";
-
-  const prependCommentPrefix = (line: string, cmt: string) => {
     const indCount =
       lowestIndentation.type === "no-indent" ? 0 : lowestIndentation.count;
 
-    const result = indChar.repeat(indCount) + cmt + " " + line.slice(indCount);
-    return result;
-  };
+    const prependCommentPrefix =
+      (cmt: string, omitEmpty = false) =>
+      (line: string) => {
+        if (omitEmpty && isLineEmpty(line)) {
+          return line;
+        }
+        const result =
+          indChar.repeat(indCount) + cmt + " " + line.slice(indCount);
+        return result;
+      };
 
-  // TODO: jsx block aware comments
-  // TODO: ignore if line already commented?
-  // TODO: uncomment
-  if (
-    [".js", ".jsx", ".json", ".ts", ".tsx", ".go", ".rs"].some((ext) =>
-      filename.endsWith(ext),
-    )
-  ) {
-    return prependCommentPrefix(line, "//");
+    const wrappingComment =
+      (start: string, end: string, omitEmpty = false) =>
+      (line: string) => {
+        if (omitEmpty && isLineEmpty(line)) {
+          return line;
+        }
+        const result =
+          indChar.repeat(indCount) +
+          start +
+          " " +
+          line.slice(indCount) +
+          " " +
+          end;
+        return result;
+      };
+
+    if (
+      [".js", ".jsx", ".json", ".ts", ".tsx", ".go", ".rs"].some((ext) =>
+        filename.endsWith(ext),
+      )
+    ) {
+      return lines.map(prependCommentPrefix("/" + "/"));
+    }
+
+    if ([".css"].some((ext) => filename.endsWith(ext))) {
+      return lines.map(wrappingComment("/" + "*", "*/", true));
+    }
+
+    if ([".html"].some((ext) => filename.endsWith(ext))) {
+      return lines.map(wrappingComment("<!--", "-->", true));
+    }
+
+    if ([".hs"].some((ext) => filename.endsWith(ext))) {
+      return lines.map(prependCommentPrefix("--"));
+    }
+
+    if ([/\b(bashrc|zshrc)\b/].some((re) => re.test(filename))) {
+      return lines.map(prependCommentPrefix("#"));
+    }
+
+    const firstLine = splitNewline(fileContents)[0];
+
+    if (!firstLine.startsWith("#!/")) {
+      return lines.map(prependCommentPrefix("/" + "/"));
+    }
+
+    if (/\b(bash|zsh|sh)\b/.test(firstLine)) {
+      return lines.map(prependCommentPrefix("#"));
+    }
+
+    if (/\b(bun|node|deno)\b/.test(firstLine)) {
+      return lines.map(prependCommentPrefix("/" + "/"));
+    }
+
+    return lines.map(prependCommentPrefix("--"));
+  });
+
+function getJsxLineTypes(fileContent: string) {
+  // from chatgpt - tsx, jsx parsing
+  interface LineTypeInfo {
+    line: number;
+    column: number;
+    lineEnd: number;
+    columnEnd: number;
+    text: string;
+    parentText: string;
+    type: "jsx" | "typescript";
+    parent: "jsx" | "typescript" | null;
+    position: "start" | "end";
   }
-
-  if ([".css"].some((ext) => filename.endsWith(ext))) {
-    return isLineEmpty(line) ? line : prependCommentPrefix(line, "/*") + " */";
-  }
-
-  if ([".html"].some((ext) => filename.endsWith(ext))) {
-    return isLineEmpty(line)
-      ? line
-      : prependCommentPrefix(line, "<!--") + " -->";
-  }
-
-  if ([".hs"].some((ext) => filename.endsWith(ext))) {
-    return prependCommentPrefix(line, "--");
-  }
-
-  if ([/\b(bashrc|zshrc)\b/].some((re) => re.test(filename))) {
-    return prependCommentPrefix(line, "#");
-  }
-
-  const firstLine = splitNewline(fileContents)[0];
-
-  if (!firstLine.startsWith("#!/")) {
-    return prependCommentPrefix(line, "//");
-  }
-
-  if (/\b(bash|zsh|sh)\b/.test(firstLine)) {
-    return prependCommentPrefix(line, "#");
-  }
-
-  if (/\b(bun|node|deno)\b/.test(firstLine)) {
-    return prependCommentPrefix(line, "//");
-  }
-
-  return prependCommentPrefix(line, "//");
-};
-
-// from chatgpt - tsx, jsx parsing
-interface LineTypeInfo {
-  line: number;
-  column: number;
-  lineEnd: number;
-  columnEnd: number;
-  text: string;
-  parentText: string;
-  type: "jsx" | "typescript";
-  parent: "jsx" | "typescript" | null;
-  position: "start" | "end";
-}
-
-function getJsxLineTypes(fileContent: string): LineTypeInfo[] {
-  const lines = splitNewline(fileContent);
 
   const sourceFile = ts.createSourceFile(
     "temp.tsx",
@@ -295,17 +297,9 @@ function getJsxLineTypes(fileContent: string): LineTypeInfo[] {
 
   analyzeNode(sourceFile);
 
-  return lineTypes;
-
-  //const deduplicated = new Map<number, LineTypeInfo>();
-  //
-  //for (const info of lineTypes) {
-  //  if (!deduplicated.has(info.line) || info.type === "jsx") {
-  //    deduplicated.set(info.line, info);
-  //  }
-  //}
-
-  //return Array.from(deduplicated.values()).sort((a, b) => a.line - b.line);
+  return lineTypes.map((t) =>
+    t.type === "jsx" && t.parent === "jsx" ? "jsx" : "typescript",
+  );
 }
 
 // Example Usage

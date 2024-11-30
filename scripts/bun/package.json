@@ -11,5 +11,11 @@
     "ink": "^5.1.0",
     "react": "^18.3.1",
     "typescript": "^5.7.2"
+  },
+  "scripts": {
+     "bundle": "bun build --bundle --minify src/mb.ts --outfile dist/mb.js --target node",
+    "postbundle": "bun shim.ts && cp node_modules/yoga-wasm-web/dist/yoga.wasm dist",
+    "compile": "bun build --compile dist/mb.js --outfile bin/,m",
+    "build": "bun run bundle && bun run compile"
   }
 }

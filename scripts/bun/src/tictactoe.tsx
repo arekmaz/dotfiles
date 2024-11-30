@@ -125,8 +125,9 @@ const Counter = () => {
                   : "single"
               }
             >
-              {value === 1 && <Text>{`x`}</Text>}
+              //{value === 1 && <Text>{`x`}</Text>}
               {value === 2 && <Text>{`o`}</Text>}
+              <h1></h1>
             </Box>
           ))}
         </Box>

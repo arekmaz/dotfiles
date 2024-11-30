@@ -2,6 +2,7 @@ import { Args, Command } from "@effect/cli";
 import { FileSystem } from "@effect/platform";
 import { Console, Effect } from "effect";
 import { invariant } from "./invariant.js";
+import ts from "typescript";
 
 const file = Args.file({ name: "file" });
 
@@ -163,7 +164,9 @@ const commentLine = (
   }
 
   if ([".html"].some((ext) => filename.endsWith(ext))) {
-    return isLineEmpty(line) ? line : prependCommentPrefix(line, "<!--") + " -->";
+    return isLineEmpty(line)
+      ? line
+      : prependCommentPrefix(line, "<!--") + " -->";
   }
 
   if ([".hs"].some((ext) => filename.endsWith(ext))) {
@@ -190,3 +193,132 @@ const commentLine = (
 
   return prependCommentPrefix(line, "//");
 };
+
+// from chatgpt - tsx, jsx parsing
+interface LineTypeInfo {
+  line: number;
+  column: number;
+  lineEnd: number;
+  columnEnd: number;
+  text: string;
+  parentText: string;
+  type: "jsx" | "typescript";
+  parent: "jsx" | "typescript" | null;
+  position: "start" | "end";
+}
+
+function getJsxLineTypes(fileContent: string): LineTypeInfo[] {
+  const lines = splitNewline(fileContent);
+
+  const sourceFile = ts.createSourceFile(
+    "temp.tsx",
+    fileContent,
+    ts.ScriptTarget.Latest,
+    true,
+    ts.ScriptKind.TSX,
+  );
+
+  const lineTypes: LineTypeInfo[] = [];
+
+  function analyzeNode(node: ts.Node) {
+    const { line, character } = sourceFile.getLineAndCharacterOfPosition(
+      node.getStart(),
+    );
+
+    const endPosition = node.getEnd();
+    const { line: lineEnd, character: columnEnd } =
+      sourceFile.getLineAndCharacterOfPosition(endPosition);
+
+    const parentNode = node.parent;
+
+    const lineType: LineTypeInfo = {
+      position: "start", // default
+      line,
+      column: character,
+      text: node.getText(),
+      lineEnd,
+      columnEnd,
+      parentText: node.getText(),
+      type:
+        ts.isJsxElement(node) || ts.isJsxSelfClosingElement(node)
+          ? "jsx"
+          : "typescript",
+      parent: parentNode
+        ? ts.isJsxElement(parentNode) || ts.isJsxSelfClosingElement(parentNode)
+          ? "jsx"
+          : "typescript"
+        : null,
+    };
+
+    if (!parentNode) {
+      ts.forEachChild(node, analyzeNode);
+      return;
+    }
+
+    const currentOnIndex = lineTypes[line];
+
+    const endLineNode = lineTypes[lineEnd];
+
+    if (
+      !endLineNode ||
+      (endLineNode.position === "end" &&
+        lineType.columnEnd > endLineNode.columnEnd)
+    ) {
+      lineTypes[lineEnd] = { ...lineType, position: "end" };
+    }
+
+    if (!currentOnIndex) {
+      lineTypes[line] = lineType;
+      ts.forEachChild(node, analyzeNode);
+      return;
+    }
+
+    // choose the node that starts earlier, (towards the column start)
+    if (currentOnIndex.column > lineType.column) {
+      lineTypes[line] = lineType;
+      ts.forEachChild(node, analyzeNode);
+      return;
+    }
+
+    // choose bigger node if they start at the same position
+    if (
+      currentOnIndex.column === lineType.column &&
+      currentOnIndex.text.length < lineType.text.length
+    ) {
+      lineTypes[line] = lineType;
+      ts.forEachChild(node, analyzeNode);
+      return;
+    }
+
+    ts.forEachChild(node, analyzeNode);
+  }
+
+  analyzeNode(sourceFile);
+
+  return lineTypes;
+
+  //const deduplicated = new Map<number, LineTypeInfo>();
+  //
+  //for (const info of lineTypes) {
+  //  if (!deduplicated.has(info.line) || info.type === "jsx") {
+  //    deduplicated.set(info.line, info);
+  //  }
+  //}
+
+  //return Array.from(deduplicated.values()).sort((a, b) => a.line - b.line);
+}
+
+// Example Usage
+const tsxContent = `const value = 42;
+const element = <div>Hello, world!</div>;
+function App() {
+  return <h1>
+  <div>
+  {value}
+  </div>
+  </h1>;
+}
+`;
+
+const result = getJsxLineTypes(tsxContent);
+console.log(result);

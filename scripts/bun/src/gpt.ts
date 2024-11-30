@@ -55,11 +55,10 @@ export const gpt = Command.make(
 
       let responseContent = yield* gptPrompt(content, { model, keyfile });
 
-      if (
-        codeOnly
-      ) {
+      if (codeOnly) {
         responseContent = responseContent
-        .replace(/[\s\S]*```.+\n/, "").replace(/```[\s\S]*/, '')
+          .replace(/[\s\S]*```.+\n/, "")
+          .replace(/\n```[\s\S]*/, "");
       }
 
       yield* Console.log(responseContent);

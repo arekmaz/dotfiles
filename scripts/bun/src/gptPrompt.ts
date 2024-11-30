@@ -81,13 +81,15 @@ export const gptPrompt = (
 
     let responseContent = response.choices[0].message.content;
 
-    yield* fs.writeFileString(historyFilePath, responseContent + "\n\n", {
-      flag: "a",
-    });
+    if (saveAnswers) {
+      yield* fs.writeFileString(historyFilePath, responseContent + "\n\n", {
+        flag: "a",
+      });
 
-    yield* fs.writeFileString(lastAnswerFilePath, responseContent + "\n", {
-      flag: "a",
-    });
+      yield* fs.writeFileString(lastAnswerFilePath, responseContent + "\n", {
+        flag: "a",
+      });
+    }
 
     return responseContent;
   });

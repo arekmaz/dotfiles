@@ -6,9 +6,10 @@ import { sb } from "./sb.js";
 import { cmt } from "./cmt.js";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { FetchHttpClient } from "@effect/platform";
+import { build } from "./build.js";
 
 const command = Command.make(",m", {}, () => Console.log("Bun Monolith")).pipe(
-  Command.withSubcommands([gpt, tictactoe, sb, cmt]),
+  Command.withSubcommands([gpt, tictactoe, sb, cmt, build]),
 );
 
 const cli = Command.run(command, {

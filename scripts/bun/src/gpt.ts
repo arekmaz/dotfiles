@@ -38,6 +38,37 @@ const readStdin = Effect.promise(async () => {
   return stdin;
 });
 
+const ts = Command.make(
+  "ts",
+  {
+    prompt,
+    keyfile,
+    model,
+  },
+
+  ({ prompt, keyfile, model }) => {
+    const e = Effect.gen(function* () {
+      const stdin = yield* readStdin;
+
+      const content = `you will loose points if you output anything else than minimal valid working code in typescript:
+
+      }${prompt.concat([stdin]).join(" ")}`;
+
+      let responseContent = yield* gptPrompt(content, { model, keyfile });
+
+      if (codeOnly) {
+        responseContent = responseContent
+          .replace(/[\s\S]*```.+\n/, "")
+          .replace(/\n```[\s\S]*/, "");
+      }
+
+      yield* Console.log(responseContent);
+    });
+
+    return e;
+  },
+);
+
 export const gpt = Command.make(
   "gpt",
   { prompt, keyfile, model, codeOnly },
@@ -66,4 +97,4 @@ export const gpt = Command.make(
 
     return e;
   },
-);
+).pipe(Command.withSubcommands([ts]));

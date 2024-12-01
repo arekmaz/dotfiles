@@ -1,14 +1,14 @@
 import { Command } from "@effect/cli";
-import { Console, Effect } from "effect";
-import { gpt } from "./gpt.js";
-import { tictactoe } from "./tictactoe.jsx";
-import { sb } from "./sb.js";
-import { cmt } from "./cmt.js";
-import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { FetchHttpClient } from "@effect/platform";
+import { BunContext, BunRuntime } from "@effect/platform-bun";
+import { Effect } from "effect";
 import { build } from "./build.js";
+import { cmt } from "./cmt.js";
+import { gpt } from "./gpt.js";
+import { sb } from "./sb.js";
+import { tictactoe } from "./tictactoe.jsx";
 
-const command = Command.make(",m", {}, () => Console.log("Bun Monolith")).pipe(
+const command = Command.make(",m").pipe(
   Command.withSubcommands([gpt, tictactoe, sb, cmt, build]),
 );
 

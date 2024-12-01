@@ -21,3 +21,5 @@ for (const match of matches) {
 
 await Bun.write("dist/mb.js", content)
 console.log("Successfully shimmed bin/bin.js")
+
+export {}

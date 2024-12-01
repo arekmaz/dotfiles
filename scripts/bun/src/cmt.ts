@@ -31,10 +31,6 @@ export const cmt = Command.make("cmt", { file }, ({ file }) => {
 
     invariant(stdin.length > 0, "no stdin, cannot comment anything");
 
-    const fs = yield* FileSystem.FileSystem;
-
-    invariant(yield* fs.exists(file), `file ${file} does not exist`);
-
     const commentedLines = yield* getCommentedLines(stdin, file);
 
     yield* Console.log(commentedLines.join("\n"));

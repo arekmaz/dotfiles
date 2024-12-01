@@ -45,33 +45,10 @@ export NVM_DIR="$HOME/.nvm"
 source "${NVM_DIR}/nvm.sh"
 
 parse_git_branch() {
-     git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/[\1]/'
+    printf "[%s]" "$(git branch --show-current)"
 }
 
-function show_user_host_if_remote() {
-  local home_host="mac.local" # Change this to your home or host machine's hostname
-  local current_host=$(hostname)
-
-  if [[ "$current_host" != "$home_host" ]]; then
-    local user=$(whoami)
-    local host=$(hostname -s) # -f for fully qualified domain name, if necessary
-    echo "${user}@${host}:"
-  fi
-}
-
-function show_hostname() {
-  
-  #if [ -n "$TMUX" ]; then
-    #echo "$(hostname -s)-tmux"
-  #else
-    hostname -s
-  #fi
-}
-
-
-# export PS1="\[\e[91m\]\$(parse_git_branch)\$(show_user_host_if_remote)\[\e[32m\][\w]\[\e[00m\]$ "
-# export PS1="\$(show_user_host_if_remote)\w$ "
-export PS1="\$(whoami)@$(show_hostname):\w\$(parse_git_branch)$ "
+export PS1="\$(whoami)@$(hostname -s):\w\$(parse_git_branch)$ "
 
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"
@@ -150,5 +127,3 @@ function duck() {
 function duck!() {
   lynx "https://lite.duckduckgo.com/lite?q=$*+!"
 }
-
-eval "$(,m --completions bash)"

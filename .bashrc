@@ -48,7 +48,8 @@ parse_git_branch() {
     printf "[%s]" "$(git branch --show-current)"
 }
 
-export PS1="\$(whoami)@$(hostname -s):\w\$(parse_git_branch)$ "
+#export PS1="\$(whoami)@$(hostname -s):\w\$(parse_git_branch)$ "
+export PS1="$ "
 
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"

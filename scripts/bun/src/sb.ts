@@ -4,9 +4,12 @@ import { Config, Console, Effect, Schema } from "effect";
 
 const filename = Args.text({ name: "filename" }).pipe(Args.repeated);
 
+const sbHome = Config.nonEmptyString("SB_HOME");
+const sbInbox = Config.nonEmptyString("SB_INBOX");
+
 const newNote = Command.make("new", { filename }, ({ filename }) =>
   Effect.gen(function* () {
-    const fs = yield* FileSystem.FileSystem
+    const fs = yield* FileSystem.FileSystem;
 
     const name = yield* Schema.decodeUnknown(
       Schema.NonEmptyArray(
@@ -14,12 +17,12 @@ const newNote = Command.make("new", { filename }, ({ filename }) =>
       ),
     )(filename).pipe(Effect.map((chunks) => chunks.join("_") + ".md"));
 
-    const sbHome = yield* Config.nonEmptyString('SB_INBOX')
+    const inbox = yield* sbInbox;
 
-    const newFilePath = sbHome + '/' + name
+    const newFilePath = inbox + "/" + name;
 
     if (yield* fs.exists(newFilePath)) {
-      throw new Error(`file ${newFilePath} already exists, aborting...`)
+      throw new Error(`file ${newFilePath} already exists, aborting...`);
     }
 
     const contentToWrite = `
@@ -52,11 +55,13 @@ const newNote = Command.make("new", { filename }, ({ filename }) =>
 Links
 
 Created ${new Date().toISOString()}
-    `
+    `;
 
-    yield* fs.writeFileString(newFilePath, contentToWrite)
+    yield* fs.writeFileString(newFilePath, contentToWrite);
 
-    yield* Console.log(newFilePath.includes(' ') ? `"${newFilePath}"` : newFilePath)
+    yield* Console.log(
+      newFilePath.includes(" ") ? `"${newFilePath}"` : newFilePath,
+    );
   }),
 );
 

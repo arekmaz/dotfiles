@@ -45,11 +45,11 @@ export NVM_DIR="$HOME/.nvm"
 source "${NVM_DIR}/nvm.sh"
 
 parse_git_branch() {
-    printf "[%s]" "$(git branch --show-current)"
+    git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/[\1]/'
 }
 
-#export PS1="\$(whoami)@$(hostname -s):\w\$(parse_git_branch)$ "
-export PS1="$ "
+export PS1="\$(whoami)@$(hostname -s):\w\$(parse_git_branch)$ "
+#export PS1="$ "
 
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"

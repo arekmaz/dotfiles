@@ -176,17 +176,17 @@ export const getCommentedLines = (lines: string[], filename: string) =>
 
     const firstLine = splitNewline(fileContents)[0];
 
-    if (!firstLine.startsWith("#!/")) {
+    if (/\b(bun|node|deno)\b/.test(firstLine)) {
       return lines.map(prependCommentPrefix("/" + "/"));
+    }
+
+    if (firstLine.startsWith("#!/")) {
+      return lines.map(prependCommentPrefix("#"));
     }
 
     if (/\b(bash|zsh|sh)\b/.test(firstLine)) {
       return lines.map(prependCommentPrefix("#"));
     }
 
-    if (/\b(bun|node|deno)\b/.test(firstLine)) {
-      return lines.map(prependCommentPrefix("/" + "/"));
-    }
-
-    return lines.map(prependCommentPrefix("--"));
+    return lines.map(prependCommentPrefix("/" + "/"));
   });

@@ -7,12 +7,18 @@ const color = Options.boolean("color").pipe(
   Options.withDefault(() => false),
 );
 
-export const weather = Command.make("weather", { color }, ({ color }) =>
+const long = Options.boolean("long").pipe(
+  Options.withAlias("l"),
+  Options.withDefault(() => false),
+);
+
+export const weather = Command.make("weather", { color, long }, ({ color, long }) =>
   Effect.gen(function* () {
     const exec = yield* CommandExecutor.CommandExecutor;
+    const cmd = long ? Cmd.make("curl", `wttr.in${color ? "" : "?T"}`) : Cmd.make("curl", `wttr.in?format=1`)
 
     yield* exec
-      .streamLines(Cmd.make("curl", `wttr.in${color ? "" : "?T"}`))
+      .streamLines(cmd)
       .pipe(
         Stream.filter(
           (l) => l.length > 0 && !/follow .* for .* updates/i.test(l),

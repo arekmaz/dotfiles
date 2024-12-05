@@ -7,9 +7,11 @@ import { cmt } from "./cmt.js";
 import { gpt } from "./gpt.js";
 import { sb } from "./sb.js";
 import { tictactoe } from "./tictactoe.jsx";
+import { ch } from "./ch.js";
+import { weather } from "./weather.js";
 
 const command = Command.make(",m").pipe(
-  Command.withSubcommands([gpt, tictactoe, sb, cmt, build]),
+  Command.withSubcommands([gpt, tictactoe, sb, cmt, build, ch, weather]),
 );
 
 const cli = Command.run(command, {

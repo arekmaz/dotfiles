@@ -15,7 +15,7 @@ const long = Options.boolean("long").pipe(
 export const weather = Command.make("weather", { color, long }, ({ color, long }) =>
   Effect.gen(function* () {
     const exec = yield* CommandExecutor.CommandExecutor;
-    const cmd = long ? Cmd.make("curl", `wttr.in${color ? "" : "?T"}`) : Cmd.make("curl", `wttr.in?format=1`)
+    const cmd = long ? Cmd.make("curl", `wttr.in${color ? "" : "?T"}`) : Cmd.make("curl", `wttr.in?0${color ? '' : 'T'}`)
 
     yield* exec
       .streamLines(cmd)

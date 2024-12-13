@@ -88,6 +88,7 @@ highlight Search cterm=NONE ctermfg=white ctermbg=blue guibg=white guifg=Black
 "make bprevious shortcut usable on mac [usually ctrl+(l|r) arrow]
 nnoremap <C-h> :bprevious<CR>
 nnoremap <C-l> :bnext<CR>
+nnoremap <leader>f :!npx prettier --write '%'<CR><CR>
 
 
 " ignore node_modules with builtin find

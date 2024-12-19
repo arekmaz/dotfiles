@@ -58,8 +58,15 @@ require("lazy").setup({
       { "hrsh7th/cmp-buffer" },
       { "hrsh7th/cmp-path" },
       { "hrsh7th/cmp-nvim-lsp" },
+      {
+        "nvimtools/none-ls.nvim",
+        dependencies = {
+          "nvimtools/none-ls-extras.nvim",
+          "nvim-lua/plenary.nvim"
+        },
+      },
       { "hrsh7th/cmp-nvim-lua" }, },
-  },
+    },
   "djoshea/vim-autoread",
 })
 

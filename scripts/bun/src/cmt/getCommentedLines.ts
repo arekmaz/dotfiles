@@ -149,7 +149,7 @@ export const getCommentedLines = (lines: string[], filename: string) =>
     }
 
     if ([".lua"].some((ext) => filename.endsWith(ext))) {
-      return lines.map(prependCommentPrefix('"'));
+      return lines.map(prependCommentPrefix('--'));
     }
 
     if (

@@ -5,13 +5,14 @@ import { Effect } from "effect";
 import { build } from "./build.js";
 import { cmt } from "./cmt.js";
 import { gpt } from "./gpt.js";
+import { ollama } from "./ollama.js";
 import { sb } from "./sb.js";
 import { tictactoe } from "./tictactoe.jsx";
 import { ch } from "./ch.js";
 import { weather } from "./weather.js";
 
 const command = Command.make(",m").pipe(
-  Command.withSubcommands([gpt, tictactoe, sb, cmt, build, ch, weather]),
+  Command.withSubcommands([gpt, tictactoe, sb, cmt, build, ch, weather, ollama]),
 );
 
 const cli = Command.run(command, {

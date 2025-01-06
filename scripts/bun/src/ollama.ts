@@ -1,23 +1,15 @@
 import { Args, Command, Options } from "@effect/cli";
 import { Console, Effect } from "effect";
-import { gptPrompt } from "./gptPrompt.js";
+import { $ } from "bun";
 
-const home = Bun.env.HOME || "~";
-const defaultKeyPath = `${home}/.chatgpt-key`;
-
-const defaultModel = "gpt-4o";
-
-const keyfile = Options.file("keyfile").pipe(
-  Options.withAlias("k"),
-  Options.withDefault(defaultKeyPath),
-);
+const defaultModel = "llama3.2";
 
 const codeOnly = Options.boolean("code-only").pipe(
   Options.withAlias("c"),
   Options.withDefault(false),
 );
 
-const models = [defaultModel, "gpt-3.5-turbo", "o1-mini", "o1-preview"] as const;
+const models = [defaultModel] as const;
 
 const model = Options.choice("model", models).pipe(
   Options.withAlias("m"),
@@ -38,7 +30,7 @@ const readStdin = Effect.promise(async () => {
   let stdin = "";
 
   for await (const line of console) {
-    stdin += '\n' + line;
+    stdin += "\n" + line;
   }
 
   return stdin;
@@ -48,11 +40,10 @@ const ts = Command.make(
   "ts",
   {
     prompt,
-    keyfile,
     model,
   },
 
-  ({ prompt, keyfile, model }) => {
+  ({ prompt, model }) => {
     const e = Effect.gen(function* () {
       const stdin = yield* readStdin;
 
@@ -60,7 +51,9 @@ const ts = Command.make(
 
       }${prompt.concat([stdin]).join(" ")}`;
 
-      let responseContent = yield* gptPrompt(content, { model, keyfile });
+      let responseContent = yield* Effect.promise(() =>
+        $`echo ${content} | ollama run ${model}`.text(),
+      );
 
       if (codeOnly) {
         responseContent = responseContent
@@ -75,10 +68,10 @@ const ts = Command.make(
   },
 );
 
-export const gpt = Command.make(
-  "gpt",
-  { prompt, keyfile, model, codeOnly, showModels },
-  ({ prompt, keyfile, model, codeOnly, showModels }) => {
+export const ollama = Command.make(
+  "oll",
+  { prompt, model, codeOnly, showModels },
+  ({ prompt, model, codeOnly, showModels }) => {
     const e = Effect.gen(function* () {
       if (showModels) {
         console.log(`Available models: ${models.join(", ")}`);
@@ -95,7 +88,10 @@ export const gpt = Command.make(
           : ""
       }${prompt.concat([stdin]).join(" ")}`;
 
-      let responseContent = yield* gptPrompt(content, { model, keyfile });
+
+      let responseContent = yield* Effect.promise(() =>
+        $`echo ${content} | ollama run ${model}`.text(),
+      );
 
       if (codeOnly) {
         responseContent = responseContent

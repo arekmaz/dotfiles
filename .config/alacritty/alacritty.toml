@@ -18,7 +18,7 @@ decorations = "buttonless"
 # opacity = 0.79
 opacity = 0.982
 # opacity = 0.93
-#option_as_alt = "Both" # breaks "polish" signs
+# option_as_alt = "Both" # breaks "polish" signs
 # startup_mode = "Maximized"
 
 [window.padding]

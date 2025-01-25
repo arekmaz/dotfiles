@@ -1,6 +1,7 @@
 import { Args, Command, Options } from "@effect/cli";
 import { Console, Effect } from "effect";
 import { gptPrompt } from "./gptPrompt.js";
+import { EOL } from "os";
 
 const home = Bun.env.HOME || "~";
 const defaultKeyPath = `${home}/.chatgpt-key`;
@@ -17,7 +18,17 @@ const codeOnly = Options.boolean("code-only").pipe(
   Options.withDefault(false),
 );
 
-const models = [defaultModel, "gpt-3.5-turbo", "o1-mini", "o1-preview"] as const;
+const outputQuestion = Options.boolean("output-question").pipe(
+  Options.withAlias("q"),
+  Options.withDefault(false),
+);
+
+const models = [
+  defaultModel,
+  "gpt-3.5-turbo",
+  "o1-mini",
+  "o1-preview",
+] as const;
 
 const model = Options.choice("model", models).pipe(
   Options.withAlias("m"),
@@ -38,7 +49,7 @@ const readStdin = Effect.promise(async () => {
   let stdin = "";
 
   for await (const line of console) {
-    stdin += '\n' + line;
+    stdin += "\n" + line;
   }
 
   return stdin;
@@ -77,8 +88,8 @@ const ts = Command.make(
 
 export const gpt = Command.make(
   "gpt",
-  { prompt, keyfile, model, codeOnly, showModels },
-  ({ prompt, keyfile, model, codeOnly, showModels }) => {
+  { prompt, keyfile, model, codeOnly, showModels, outputQuestion },
+  ({ prompt, keyfile, model, codeOnly, showModels, outputQuestion }) => {
     const e = Effect.gen(function* () {
       if (showModels) {
         console.log(`Available models: ${models.join(", ")}`);
@@ -87,13 +98,15 @@ export const gpt = Command.make(
 
       const stdin = yield* readStdin;
 
+      const question = prompt.concat([stdin]).join(" ").trim();
+
       const content = `${
         codeOnly
           ? `you will loose points if you output anything else than minimal valid working code:
 
 `
           : ""
-      }${prompt.concat([stdin]).join(" ")}`;
+      }${question}`;
 
       let responseContent = yield* gptPrompt(content, { model, keyfile });
 
@@ -101,6 +114,10 @@ export const gpt = Command.make(
         responseContent = responseContent
           .replace(/[\s\S]*```.+\n/, "")
           .replace(/\n```[\s\S]*/, "");
+      }
+
+      if (outputQuestion) {
+        yield* Console.log(question + EOL);
       }
 
       yield* Console.log(responseContent);

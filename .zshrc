@@ -133,3 +133,5 @@ alias fly_push='gwip && npm version patch && git push && fly deploy'
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH=$BUN_INSTALL/bin:$PATH
+
+. "$HOME/.local/bin/env"

@@ -128,3 +128,5 @@ function duck() {
 function duck!() {
   lynx "https://lite.duckduckgo.com/lite?q=$*+!"
 }
+
+. "$HOME/.local/bin/env"

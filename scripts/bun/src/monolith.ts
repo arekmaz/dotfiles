@@ -10,9 +10,10 @@ import { sb } from "./sb.js";
 import { tictactoe } from "./tictactoe.jsx";
 import { ch } from "./ch.js";
 import { weather } from "./weather.js";
+import * as misc from "./misc.js"
 
 const command = Command.make(",m").pipe(
-  Command.withSubcommands([gpt, tictactoe, sb, cmt, build, ch, weather, ollama]),
+  Command.withSubcommands([gpt, tictactoe, sb, cmt, build, ch, weather, ollama, ...Object.values(misc)]),
 );
 
 const cli = Command.run(command, {

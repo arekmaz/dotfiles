@@ -77,13 +77,9 @@ highlight NetrwSymLink guibg=NONE ctermbg=NONE
 highlight Normal guibg=NONE ctermbg=NONE
 highlight EndOfBuffer guibg=NONE ctermbg=NONE
 
-"visual mode highlight
-highlight Visual ctermbg=white ctermfg=Black guibg=white guifg=Black
-
-highlight CursorLine ctermbg=white ctermfg=Black guibg=white guifg=Black
 
 "highlight search
-highlight Search cterm=NONE ctermfg=white ctermbg=blue guibg=white guifg=Black
+highlight Search cterm=NONE ctermfg=grey ctermbg=grey guibg=grey guifg=Black
 
 "make bprevious shortcut usable on mac [usually ctrl+(l|r) arrow]
 nnoremap <C-h> :bprevious<CR>

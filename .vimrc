@@ -79,7 +79,7 @@ highlight EndOfBuffer guibg=NONE ctermbg=NONE
 
 
 "highlight search
-highlight Search cterm=NONE ctermfg=grey ctermbg=grey guibg=grey guifg=Black
+highlight Search cterm=NONE ctermfg=Yellow ctermbg=Green guibg=yellow guifg=black
 
 "make bprevious shortcut usable on mac [usually ctrl+(l|r) arrow]
 nnoremap <C-h> :bprevious<CR>

@@ -33,3 +33,6 @@
 
 !/.config/lynx
 !/.config/lynx/**
+
+!/.config/ranger
+!/.config/ranger/**

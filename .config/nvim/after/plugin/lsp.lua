@@ -59,6 +59,7 @@ local function organize_imports()
     title = ""
   }
   vim.lsp.buf.execute_command(params)
+  vim.cmd('write')
 end
 
 local function select_ts_version()

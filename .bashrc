@@ -130,3 +130,8 @@ function duck!() {
 }
 
 . "$HOME/.local/bin/env"
+
+
+# Formulas (something that should be used only once, and picked from history, to prevent getting used to custom aliases,
+# and reinforce looking at scripts/composition if needed):
+# history | grep -Eo 'http[s]?://[^ ]+' | fzf | xargs -n1 open #url-history-search

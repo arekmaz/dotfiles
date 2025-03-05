@@ -1,5 +1,5 @@
 import ts from "typescript";
-import { invariant } from "../invariant.js";
+import { invariant } from "../invariant.ts";
 
 const splitNewline = (s: string) => s.split(/\r?\n/);
 

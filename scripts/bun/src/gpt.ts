@@ -1,6 +1,6 @@
 import { Args, Command, Options } from "@effect/cli";
 import { Console, Effect } from "effect";
-import { gptPrompt } from "./gptPrompt.js";
+import { gptPrompt } from "./gptPrompt.ts";
 import { EOL } from "os";
 
 const home = Bun.env.HOME || "~";

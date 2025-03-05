@@ -1,7 +1,7 @@
 import { FileSystem } from "@effect/platform";
 import { Effect } from "effect";
-import { invariant } from "../invariant.js";
-import { commentJsxLines } from "./commentTsx.js";
+import { invariant } from "../invariant.ts";
+import { commentJsxLines } from "./commentTsx.ts";
 
 const getLowestIndentation = (lines: string[]) => {
   let lowestIndentation:

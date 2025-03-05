@@ -2,15 +2,15 @@ import { Command } from "@effect/cli";
 import { FetchHttpClient } from "@effect/platform";
 import { BunContext, BunRuntime } from "@effect/platform-bun";
 import { Effect } from "effect";
-import { build } from "./build.js";
-import { cmt } from "./cmt.js";
-import { gpt } from "./gpt.js";
-import { ollama } from "./ollama.js";
-import { sb } from "./sb.js";
-import { tictactoe } from "./tictactoe.jsx";
-import { ch } from "./ch.js";
-import { weather } from "./weather.js";
-import * as misc from "./misc.js"
+import { build } from "./build.ts";
+import { cmt } from "./cmt.ts";
+import { gpt } from "./gpt.ts";
+import { ollama } from "./ollama.ts";
+import { sb } from "./sb.ts";
+import { tictactoe } from "./tictactoe.tsx";
+import { ch } from "./ch.ts";
+import { weather } from "./weather.ts";
+import * as misc from "./misc.ts"
 
 const command = Command.make(",m").pipe(
   Command.withSubcommands([gpt, tictactoe, sb, cmt, build, ch, weather, ollama, ...Object.values(misc)]),

@@ -1,8 +1,7 @@
 import { Args, Command } from "@effect/cli";
-import { FileSystem } from "@effect/platform";
 import { Console, Effect } from "effect";
-import { getCommentedLines } from "./cmt/getCommentedLines.js";
-import { invariant } from "./invariant.js";
+import { getCommentedLines } from "./cmt/getCommentedLines.ts";
+import { invariant } from "./invariant.ts";
 
 const file = Args.file({ name: "file" });
 

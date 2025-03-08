@@ -59,7 +59,7 @@ export const gptPrompt = (
 
     const response = yield* HttpClient.execute(openAiRequest).pipe(
       Effect.flatMap(
-        HttpClientResponse.schemaBodyJson(
+        response => HttpClientResponse.schemaBodyJson(
           Schema.Struct({
             choices: Schema.NonEmptyArray(
               Schema.Struct({
@@ -67,7 +67,7 @@ export const gptPrompt = (
               }),
             ),
           }),
-        ),
+        )(response).pipe(Effect.tapError(() => Console.log(`error response: ${JSON.stringify(response.toJSON(), null, 2)}`))),
       ),
       Effect.scoped,
       Effect.tapError(Console.error),

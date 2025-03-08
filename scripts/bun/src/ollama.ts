@@ -3,14 +3,14 @@ import { Console, Effect } from "effect";
 import { $ } from "bun";
 import { stdinString } from "./stdin.ts";
 
-const defaultModel = "llama3.2";
+const defaultModel = "deepseek-r1";
 
 const codeOnly = Options.boolean("code-only").pipe(
   Options.withAlias("c"),
   Options.withDefault(false),
 );
 
-const models = [defaultModel] as const;
+const models = [defaultModel, "llama3.2"] as const;
 
 const model = Options.choice("model", models).pipe(
   Options.withAlias("m"),

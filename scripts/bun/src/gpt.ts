@@ -26,9 +26,11 @@ const outputQuestion = Options.boolean("output-question").pipe(
 
 const models = [
   defaultModel,
+  "gpt-4o-mini",
   "gpt-3.5-turbo",
   "o1-mini",
   "o1-preview",
+  "text-embedding-3-small"
 ] as const;
 
 const model = Options.choice("model", models).pipe(

@@ -2,6 +2,7 @@ import { Args, Command, Options } from "@effect/cli";
 import { Console, Effect } from "effect";
 import { gptPrompt } from "./gptPrompt.ts";
 import { EOL } from "os";
+import { stdinString } from "./stdin.ts";
 
 const home = Bun.env.HOME || "~";
 const defaultKeyPath = `${home}/.chatgpt-key`;
@@ -41,20 +42,6 @@ const showModels = Options.boolean("show-models").pipe(
 
 const prompt = Args.text({ name: "prompt" }).pipe(Args.repeated);
 
-const readStdin = Effect.promise(async () => {
-  if (process.stdin.isTTY) {
-    return "";
-  }
-
-  let stdin = "";
-
-  for await (const line of console) {
-    stdin += "\n" + line;
-  }
-
-  return stdin;
-});
-
 const ts = Command.make(
   "ts",
   {
@@ -65,7 +52,7 @@ const ts = Command.make(
 
   ({ prompt, keyfile, model }) => {
     const e = Effect.gen(function* () {
-      const stdin = yield* readStdin;
+      const stdin = yield* stdinString
 
       const content = `you will loose points if you output anything else than minimal valid working code in typescript:
 

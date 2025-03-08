@@ -1,6 +1,7 @@
 import { Args, Command, Options } from "@effect/cli";
 import { Console, Effect } from "effect";
 import { $ } from "bun";
+import { stdinString } from "./stdin.ts";
 
 const defaultModel = "llama3.2";
 
@@ -22,20 +23,6 @@ const showModels = Options.boolean("show-models").pipe(
 
 const prompt = Args.text({ name: "prompt" }).pipe(Args.repeated);
 
-const readStdin = Effect.promise(async () => {
-  if (process.stdin.isTTY) {
-    return "";
-  }
-
-  let stdin = "";
-
-  for await (const line of console) {
-    stdin += "\n" + line;
-  }
-
-  return stdin;
-});
-
 const ts = Command.make(
   "ts",
   {
@@ -45,7 +32,7 @@ const ts = Command.make(
 
   ({ prompt, model }) => {
     const e = Effect.gen(function* () {
-      const stdin = yield* readStdin;
+      const stdin = yield* stdinString;
 
       const content = `you will loose points if you output anything else than minimal valid working code in typescript:
 
@@ -78,7 +65,7 @@ export const ollama = Command.make(
         return;
       }
 
-      const stdin = yield* readStdin;
+      const stdin = yield* stdinString;
 
       const content = `${
         codeOnly
@@ -87,7 +74,6 @@ export const ollama = Command.make(
 `
           : ""
       }${prompt.concat([stdin]).join(" ")}`;
-
 
       let responseContent = yield* Effect.promise(() =>
         $`echo ${content} | ollama run ${model}`.text(),

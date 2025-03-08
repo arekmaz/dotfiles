@@ -1,10 +1,6 @@
 import { Command } from "@effect/cli";
 import { Console, Effect, Stream } from "effect";
-
-const stdinStream = Stream.fromAsyncIterable(
-  console,
-  () => new Error("Failed to read from stdin"),
-);
+import { stdinStream } from "./stdin.ts";
 
 function escapeHtml(str: string) {
   return str
@@ -19,7 +15,9 @@ export const md2html = Command.make("md2html", {}, () => {
   const e = Effect.gen(function* () {
     let inCodeBlock = false;
 
-    yield* stdinStream.pipe(
+    const stdin = yield* stdinStream
+
+    stdin.pipe(
       Stream.flatMap((data) => {
         let line = data.trim();
 

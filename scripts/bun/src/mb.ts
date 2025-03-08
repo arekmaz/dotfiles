@@ -1,1 +1,1 @@
-import "../src/monolith";
+import "../src/monolith.ts";

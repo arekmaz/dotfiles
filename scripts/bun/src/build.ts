@@ -1,7 +1,7 @@
 import { Command } from "@effect/cli";
 import { $ } from 'bun';
 import { Effect } from "effect";
-import { bunHome } from "./dirs";
+import { bunHome } from "./dirs.ts";
 
 export const build = Command.make("build", {}, () => {
   const e = Effect.gen(function* () {

@@ -1,36 +1,19 @@
 import { Args, Command } from "@effect/cli";
-import { Console, Effect } from "effect";
+import { Chunk, Console, Effect, Stream } from "effect";
 import { getCommentedLines } from "./cmt/getCommentedLines.ts";
 import { invariant } from "./invariant.ts";
+import { stdinStream } from "./stdin.ts";
 
 const file = Args.file({ name: "file" });
 
-const readStdin = Effect.promise(async () => {
-  if (process.stdin.isTTY) {
-    return [];
-  }
-
-  let stdin = [];
-
-  for await (const line of console) {
-    stdin.push(line);
-  }
-  // if the last line is "", that means a newline was the last char,
-  // in that case remove it
-  if (stdin.at(-1) === "") {
-    stdin.pop();
-  }
-
-  return stdin;
-});
-
 export const cmt = Command.make("cmt", { file }, ({ file }) => {
   const e = Effect.gen(function* () {
-    const stdin = yield* readStdin;
+    const stdin = yield* stdinStream;
+    const stdinLines = Chunk.toArray(yield* stdin.pipe(Stream.runCollect));
 
-    invariant(stdin.length > 0, "no stdin, cannot comment anything");
+    invariant(stdinLines.length > 0, "no stdin, cannot comment anything");
 
-    const commentedLines = yield* getCommentedLines(stdin, file);
+    const commentedLines = yield* getCommentedLines(stdinLines, file);
 
     yield* Console.log(commentedLines.join("\n"));
   });

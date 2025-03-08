@@ -1,68 +1,63 @@
 import { Command } from "@effect/cli";
-import { Console, Effect } from "effect";
+import { Console, Effect, Stream } from "effect";
 
-const readStdin = Effect.promise(async () => {
-  if (process.stdin.isTTY) {
-    return "";
-  }
+const stdinStream = Stream.fromAsyncIterable(
+  console,
+  () => new Error("Failed to read from stdin"),
+);
 
-  let stdin = "";
-
-  for await (const line of console) {
-    stdin += "\n" + line;
-  }
-
-  return stdin;
-});
+function escapeHtml(str: string) {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
 
 export const md2html = Command.make("md2html", {}, () => {
   const e = Effect.gen(function* () {
-    const stdIn = yield* readStdin;
+    let inCodeBlock = false;
 
-    function escapeHtml(str: string) {
-      return str
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#39;");
-    }
+    yield* stdinStream.pipe(
+      Stream.flatMap((data) => {
+        let line = data.trim();
 
-    function parseMarkdown(md: string) {
-      let html = "";
-      const lines = md.split("\n");
-      let inCodeBlock = false;
-
-      for (let line of lines) {
-        line = line.trim();
-
-        if (line.startsWith('#')) {
-        continue}
+        if (!line || line.startsWith("#")) {
+          return Stream.empty;
+        }
 
         if (line.startsWith("```")) {
-          if (!inCodeBlock) {
-            html += "<pre><code>";
-          } else {
-            html += "</code></pre>\n";
-          }
-          inCodeBlock = !inCodeBlock;
-          continue;
+          const isInCodeBlock = inCodeBlock;
+
+          inCodeBlock = !isInCodeBlock;
+
+          return Stream.succeed(
+            isInCodeBlock ? "</code></pre>" : "<pre><code>",
+          );
         }
 
         if (inCodeBlock) {
-          html += escapeHtml(line) + "\n";
-          continue;
+          return Stream.succeed(escapeHtml(line));
         }
 
-        // Headings
+        // Preserve raw HTML
+        if (
+          /^\s*<[^>]+>.*<\/[^>]+>\s*$/.test(line) ||
+          /^\s*<[^>]+\/?>\s*$/.test(line)
+        ) {
+          return Stream.succeed(line);
+        }
+
         const headingMatch = line.match(/^(#{1,6})\s+(.*)/);
+
         if (headingMatch) {
           const level = headingMatch[1].length;
-          html += `<h${level}>${escapeHtml(headingMatch[2])}</h${level}>\n`;
-          continue;
+          return Stream.succeed(
+            `<h${level}>${escapeHtml(headingMatch[2])}</h${level}>`,
+          );
         }
 
-        // Bold & Italics
         line = line
           .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
           .replace(/__(.*?)__/g, "<strong>$1</strong>")
@@ -70,27 +65,28 @@ export const md2html = Command.make("md2html", {}, () => {
           .replace(/_(.*?)_/g, "<em>$1</em>")
           .replace(/`([^`]+)`/g, "<code>$1</code>");
 
-        // Blockquote
         if (line.startsWith(">")) {
-          html += `<blockquote>${escapeHtml(line.substring(1).trim())}</blockquote>\n`;
-          continue;
+          return Stream.succeed(
+            `<blockquote>${escapeHtml(line.substring(1).trim())}</blockquote>`,
+          );
         }
 
         // Horizontal Rule
         if (/^---+$/.test(line)) {
-          html += "<hr>\n";
-          continue;
+          return Stream.succeed("<hr>");
         }
 
         // Lists
         if (/^(\*|-)\s+/.test(line)) {
-          html += `<ul><li>${escapeHtml(line.substring(2))}</li></ul>\n`;
-          continue;
+          return Stream.succeed(
+            `<ul><li>${escapeHtml(line.substring(2))}</li></ul>`,
+          );
         }
 
         if (/^\d+\.\s+/.test(line)) {
-          html += `<ol><li>${escapeHtml(line.replace(/^\d+\.\s+/, ""))}</li></ol>\n`;
-          continue;
+          return Stream.succeed(
+            `<ol><li>${escapeHtml(line.replace(/^\d+\.\s+/, ""))}</li></ol>`,
+          );
         }
 
         // Links
@@ -104,14 +100,13 @@ export const md2html = Command.make("md2html", {}, () => {
 
         // Paragraphs
         if (line) {
-          html += `<p>${line}</p>\n`;
+          return Stream.succeed(`<p>${line}</p>`);
         }
-      }
 
-      return html;
-    }
-
-    yield* Console.log(parseMarkdown(stdIn))
+        return Stream.succeed(line);
+      }),
+      Stream.runForEach(Console.log),
+    );
   });
 
   return e;

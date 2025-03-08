@@ -18,7 +18,6 @@ export const interactiveShell = (program: string, ...args: string[]) =>
             }).exited,
         ),
       ),
-      Effect.scoped,
     );
   });
 

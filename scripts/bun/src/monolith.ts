@@ -12,6 +12,7 @@ import { ch } from "./ch.ts";
 import { weather } from "./weather.ts";
 import { md2html } from "./md2html.ts";
 import * as misc from "./misc.ts";
+import { ed } from "./ed.ts";
 
 const command = Command.make(",m").pipe(
   Command.withSubcommands([
@@ -24,6 +25,7 @@ const command = Command.make(",m").pipe(
     weather,
     ollama,
     md2html,
+    ed,
     ...Object.values(misc),
   ]),
 );

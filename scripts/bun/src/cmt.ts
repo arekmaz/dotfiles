@@ -8,8 +8,12 @@ const file = Args.file({ name: "file" });
 
 export const cmt = Command.make("cmt", { file }, ({ file }) => {
   const e = Effect.gen(function* () {
-    const stdin = yield* stdinStream;
-    const stdinLines = Chunk.toArray(yield* stdin.pipe(Stream.runCollect));
+    const stdinLines = Chunk.toArray(
+      yield* stdinStream.pipe(
+        Stream.map((e) => e.toString()),
+        Stream.runCollect,
+      ),
+    );
 
     invariant(stdinLines.length > 0, "no stdin, cannot comment anything");
 

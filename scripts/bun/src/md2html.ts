@@ -15,13 +15,11 @@ export const md2html = Command.make("md2html", {}, () => {
   const e = Effect.gen(function* () {
     let inCodeBlock = false;
 
-    const stdin = yield* stdinStream
-
-    stdin.pipe(
+    yield* stdinStream.pipe(
       Stream.flatMap((data) => {
         let line = data.trim();
 
-        if (!line || line.startsWith("#")) {
+        if (!line) {
           return Stream.empty;
         }
 

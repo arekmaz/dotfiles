@@ -10,10 +10,22 @@ import { sb } from "./sb.ts";
 import { tictactoe } from "./tictactoe.tsx";
 import { ch } from "./ch.ts";
 import { weather } from "./weather.ts";
-import * as misc from "./misc.ts"
+import { md2html } from "./md2html.ts";
+import * as misc from "./misc.ts";
 
 const command = Command.make(",m").pipe(
-  Command.withSubcommands([gpt, tictactoe, sb, cmt, build, ch, weather, ollama, ...Object.values(misc)]),
+  Command.withSubcommands([
+    gpt,
+    tictactoe,
+    sb,
+    cmt,
+    build,
+    ch,
+    weather,
+    ollama,
+    md2html,
+    ...Object.values(misc),
+  ]),
 );
 
 const cli = Command.run(command, {

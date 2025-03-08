@@ -1,14 +1,11 @@
 import { Effect, Stream } from "effect";
-import { FileSystem } from "@effect/platform";
 
 export const stdinStream = Effect.gen(function* () {
   if (process.stdin.isTTY) {
     return Stream.empty;
   }
 
-  const fs = yield* FileSystem.FileSystem;
-
-  return fs.stream("/dev/stdin").pipe(Stream.map((a) => a.toString()));
+  return Stream.fromAsyncIterable(console, () => new Error("stdin error"));
 });
 
 export const stdinString = stdinStream.pipe(

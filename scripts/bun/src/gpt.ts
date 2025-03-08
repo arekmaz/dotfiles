@@ -83,7 +83,7 @@ export const gpt = Command.make(
         return;
       }
 
-      const stdin = yield* readStdin;
+      const stdin = yield* stdinString
 
       const question = prompt.concat([stdin]).join(" ").trim();
 

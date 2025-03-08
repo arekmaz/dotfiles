@@ -136,3 +136,4 @@ function duck!() {
 # and reinforce looking at scripts/composition if needed):
 # history | grep -Eo 'http[s]?://[^ ]+' | fzf | xargs -n1 open #url-history-search
 # perl -pe 's/_([a-z])/\U$1/g' #snake-to-camel-case
+# perl -pe 's/ /\n/g' # spaces to newlines

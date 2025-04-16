@@ -14,33 +14,34 @@ export class Player extends Effect.Service<Player>()("Player", {
       health: number;
       level: number;
       eq: Eq;
+      gold: number;
     }>({
       name: "Player",
       health: 20,
       level: 1,
       eq: { weapon: "stick" },
+      gold: 500,
     });
 
-    const name = Effect.map(data, (d) => d.name);
-    const level = Effect.map(data, (d) => d.level);
-
-    const maxHealth = Effect.map(data, (d) => d.level * 2 + 10);
-
-    const health = Effect.map(data, (d) => d.health);
-
-    const updateHealth = (fn: (o: number) => number) =>
-      Ref.update(data, (d) => ({ ...d, health: fn(d.health) }));
-
-    const eq = Effect.map(data, (d) => d.eq);
-
-    return { updateHealth, health, level, maxHealth, eq, name };
+    return data;
   }),
 }) {
-  static name = this.use((s) => s.name);
-  static eq = this.use((s) => s.eq);
-  static health = this.use((s) => s.health);
-  static maxHealth = this.use((s) => s.maxHealth);
-  static level = this.use((s) => s.level);
+  static data = this.use((s) => s);
+
+  static name = Effect.map(this.data, (d) => d.name);
+
+  static eq = Effect.map(this.data, (d) => d.eq);
+
+  static level = Effect.map(this.data, (d) => d.level);
+
+  static gold = Effect.map(this.data, (d) => d.gold);
+  static updateGold = (fn: (o: number) => number) =>
+    this.use((d) => Ref.update(d, (o) => ({ ...o, gold: fn(o.gold) })));
+
+  static health = Effect.map(this.data, (d) => d.health);
+  static maxHealth = Effect.map(this.data, (d) => d.level * 2 + 10);
+  static updateHealth = (fn: (o: number) => number) =>
+    this.use((d) => Ref.update(d, (o) => ({ ...o, health: fn(o.health) })));
 }
 
 const displayLines = (s: string | TemplateStringsArray, ...args: any[]) => {
@@ -202,8 +203,11 @@ const fight = Effect.fn("fight")(function* () {
   );
 
   const opStrike = Random.nextIntBetween(1, opponent.power).pipe(
-    Effect.tap((dmg) => Player.use((s) => s.updateHealth((h) => h - dmg))),
+    Effect.tap((dmg) => Player.updateHealth((h) => h - dmg)),
   );
+
+  const opIsAlive = Effect.map(opRef, (h) => h > 0);
+  const playerIsAlive = Effect.map(Player.health, (h) => h > 0);
 
   const fightStats = display`
       ${yield* Player.name}: ${yield* Player.health}/${yield* Player.maxHealth}
@@ -228,12 +232,41 @@ const fight = Effect.fn("fight")(function* () {
     ),
   );
 
-  while (false && (yield* opRef) > 0 && (yield* Player.health) > 0) {
+  yield* fightStats
+
+  while ((yield* playerIsAlive) && (yield* opIsAlive)) {
     yield* newLine;
 
-    yield* newLine;
+    yield* display`
+    What do you do next?
+  [A] Attack
+  [S] Stats
+  [R] Run for your life`;
 
-    yield* fightStats;
+    yield* choice({
+      a: Effect.gen(function* () {
+        const dmg = yield* playerStrike;
+        yield* display`You strike ${opponent.name}, dealing ${dmg} damage.`;
+
+        if ((yield* opRef) <= 0) {
+          yield* display`You killed ${opponent.name}`;
+          return;
+        }
+
+        const opDmg = yield* opStrike;
+        yield* display`${opponent.name}, strikes you, dealing ${opDmg} damage.`;
+
+        yield* fightStats;
+      }),
+
+      s: fightStats,
+      r: Random.nextIntBetween(3, 6).pipe(
+        Effect.tap((lost) => Player.updateGold((g) => Math.max(0, g - lost))),
+        Effect.flatMap((lost) => display`You escape, losing ${lost} gold`),
+      ),
+    });
+
+    yield* newLine;
   }
 
   yield* forest();
@@ -242,7 +275,7 @@ const fight = Effect.fn("fight")(function* () {
 const innIntro = display`Welcome to the Town's Inn, it's awfully crowded today`;
 
 const inn = Effect.fn("inn")(function* (): any {
-  yield* display``;
+  yield* newLine;
   yield* display`
     What do you do next?
   [N] check town newsboard

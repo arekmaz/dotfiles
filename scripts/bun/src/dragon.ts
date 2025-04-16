@@ -29,7 +29,7 @@ const lvlByExp = (exp: number) => {
   return result;
 };
 
-const startingExp = 2000;
+const startingExp = 0;
 const startingLevel = lvlByExp(startingExp);
 
 export class Player extends Effect.Service<Player>()("Player", {
@@ -106,8 +106,15 @@ const displayYield = Effect.fn("displayYield")(function* (
   ...args: any[]
 ) {
   const terminal = yield* Terminal.Terminal;
+
   yield* display(s, ...args);
-  yield* terminal.readInput;
+  while (true) {
+    const input = yield* terminal.readInput;
+
+    if (input.key.name === "return") {
+      break;
+    }
+  }
 });
 
 const newLine = display``;
@@ -115,19 +122,30 @@ const newLine = display``;
 const choice = <A, E, R, C extends Record<string, Effect.Effect<A, E, R>>>(
   choices: C,
 ) =>
-  Effect.fn("choice")(function* ({
-    defaultOption = Object.keys(choices)[0].toUpperCase(),
-    prompt = (choices: string[]) =>
-      display`Enter an option [${choices.join(",")}]: ${defaultOption}`,
-  } = {}) {
+  Effect.fn("choice")(function* (
+    opts: {
+      defaultOption?: keyof C & string;
+      promptPrefix?: string;
+    } = {},
+  ) {
     const terminal = yield* Terminal.Terminal;
 
     let input: string = "";
 
+    const prompt = display`${opts.promptPrefix ?? "Enter an option"} [${Object.keys(
+      choices,
+    )
+      .map((c) => c.toUpperCase())
+      .join(",")}]: ${opts.defaultOption ? `(${opts.defaultOption})` : ""}`;
+
     while (!(input in choices)) {
-      yield* prompt(Object.keys(choices).map((o) => o.toUpperCase()));
+      yield* prompt;
       yield* newLine;
       input = (yield* terminal.readInput).key.name.toLowerCase();
+
+      if (input === "return") {
+        input = opts.defaultOption ?? "";
+      }
     }
 
     return yield* choices[input];
@@ -192,7 +210,9 @@ const townSquare = Effect.fn("townSquare")(function* (): any {
 });
 
 const stats = Effect.fn("stats")(function* () {
-  yield* display`Stats:`;
+  yield* display`--------------------------------`;
+  yield* display`${yield* Player.name}'s stats:`;
+  yield* display`--------------------------------`;
   yield* newLine;
   const level = yield* Player.level;
 
@@ -297,11 +317,7 @@ const fight = Effect.fn("fight")(function* () {
         const dmg = yield* playerStrike;
         yield* display`You strike ${opponent.name}, dealing ${dmg} damage.`;
 
-        if ((yield* opRef) <= 0) {
-          yield* newLine;
-          yield* display`You killed ${opponent.name}`;
-          yield* newLine;
-          yield* displayYield();
+        if (!(yield* opIsAlive)) {
           return;
         }
 
@@ -321,6 +337,12 @@ const fight = Effect.fn("fight")(function* () {
     })();
 
     yield* newLine;
+  }
+
+  if (!(yield* opIsAlive)) {
+    yield* display`You killed ${opponent.name}`;
+    yield* newLine;
+    yield* displayYield();
   }
 
   yield* clearScreen;

@@ -1,11 +1,14 @@
 import { Command } from "@effect/cli";
 import { Terminal } from "@effect/platform";
-import { Effect, identity, Random, Ref } from "effect";
+import { Effect, Random, Ref } from "effect";
 
 const weapons = { stick: 2, dagger: 5 };
 type Weapon = keyof typeof weapons;
 
 type Eq = { weapon: Weapon };
+
+const startingLevel = 1;
+const maxHealth = (level: number) => 20 + (level - 1) * 2;
 
 export class Player extends Effect.Service<Player>()("Player", {
   effect: Effect.gen(function* () {
@@ -17,8 +20,8 @@ export class Player extends Effect.Service<Player>()("Player", {
       gold: number;
     }>({
       name: "Player",
-      health: 20,
-      level: 1,
+      health: maxHealth(startingLevel),
+      level: startingLevel,
       eq: { weapon: "stick" },
       gold: 500,
     });
@@ -39,7 +42,7 @@ export class Player extends Effect.Service<Player>()("Player", {
     this.use((d) => Ref.update(d, (o) => ({ ...o, gold: fn(o.gold) })));
 
   static health = Effect.map(this.data, (d) => d.health);
-  static maxHealth = Effect.map(this.data, (d) => d.level * 2 + 10);
+  static maxHealth = Effect.map(this.data, (d) => maxHealth(d.level));
   static updateHealth = (fn: (o: number) => number) =>
     this.use((d) => Ref.update(d, (o) => ({ ...o, health: fn(o.health) })));
 }
@@ -71,30 +74,38 @@ const display = Effect.fn("display")(function* (
   yield* terminal.display(displayLines(s, ...args));
 });
 
+const displayYield = Effect.fn("displayYield")(function* (
+  s: string | TemplateStringsArray,
+  ...args: any[]
+) {
+  const terminal = yield* Terminal.Terminal;
+  yield* display(s, ...args);
+  yield* display`Press <ENTER> to continue`;
+  yield* terminal.readInput;
+});
+
 const newLine = display``;
 
-const choice = Effect.fn("choice")(function* <
-  A,
-  E,
-  R,
-  C extends Record<string, Effect.Effect<A, E, R>>,
->(choices: C) {
-  const terminal = yield* Terminal.Terminal;
+const choice = <A, E, R, C extends Record<string, Effect.Effect<A, E, R>>>(
+  choices: C,
+) =>
+  Effect.fn("choice")(function* ({
+    defaultOption = Object.keys(choices)[0].toUpperCase(),
+    prompt = (choices: string[]) =>
+      display`Enter an option [${choices.join(",")}]: ${defaultOption}`,
+  } = {}) {
+    const terminal = yield* Terminal.Terminal;
 
-  const prompt = display`Enter an option [${Object.keys(choices)
-    .map((l) => l.toUpperCase())
-    .join(",")}]:`;
+    let input: string = "";
 
-  let input: string = "";
+    while (!(input in choices)) {
+      yield* prompt(Object.keys(choices).map((o) => o.toUpperCase()));
+      yield* newLine;
+      input = (yield* terminal.readInput).key.name.toLowerCase();
+    }
 
-  while (!(input in choices)) {
-    yield* prompt;
-    yield* newLine;
-    input = (yield* terminal.readInput).key.name.toLowerCase();
-  }
-
-  return yield* choices[input];
-});
+    return yield* choices[input];
+  });
 
 const quit = Effect.sync(() => process.exit(0));
 const clearScreen = Effect.sync(console.clear);
@@ -151,7 +162,7 @@ const townSquare = Effect.fn("townSquare")(function* (): any {
     ),
     s: stats().pipe(Effect.zipRight(townSquare())),
     q: display`quitting...`.pipe(Effect.zipRight(quit)),
-  });
+  })();
 });
 
 const stats = Effect.fn("stats")(function* () {
@@ -167,8 +178,10 @@ const stats = Effect.fn("stats")(function* () {
   yield* newLine;
 });
 
-const forestIntro = Effect.zipRight(
-  display`You arrive at the deep dark forest`,
+const forestIntro = Effect.zipRight(display`You arrive at the forest`, newLine);
+
+const forestBackMsg = Effect.zipRight(
+  display`You are back at the deep dark forest`,
   newLine,
 );
 
@@ -186,7 +199,7 @@ const forest = Effect.fn("forest")(function* (): any {
       Effect.zipRight(townSquareIntro),
       Effect.zipRight(townSquare()),
     ),
-  });
+  })();
 });
 
 const fight = Effect.fn("fight")(function* () {
@@ -209,10 +222,13 @@ const fight = Effect.fn("fight")(function* () {
   const opIsAlive = Effect.map(opRef, (h) => h > 0);
   const playerIsAlive = Effect.map(Player.health, (h) => h > 0);
 
-  const fightStats = display`
+  const fightStats = Effect.gen(function* () {
+    yield* display`
       ${yield* Player.name}: ${yield* Player.health}/${yield* Player.maxHealth}
-      ${opponent.name}: ${yield* opRef}/${opponent.maxHealth}
-    `;
+      ${opponent.name}: ${yield* opRef}/${opponent.maxHealth}`;
+  });
+
+  yield* clearScreen;
 
   yield* intro;
   yield* newLine;
@@ -232,11 +248,13 @@ const fight = Effect.fn("fight")(function* () {
     ),
   );
 
-  yield* fightStats
+  yield* newLine;
+
+  yield* fightStats;
+
+  yield* newLine;
 
   while ((yield* playerIsAlive) && (yield* opIsAlive)) {
-    yield* newLine;
-
     yield* display`
     What do you do next?
   [A] Attack
@@ -249,12 +267,14 @@ const fight = Effect.fn("fight")(function* () {
         yield* display`You strike ${opponent.name}, dealing ${dmg} damage.`;
 
         if ((yield* opRef) <= 0) {
-          yield* display`You killed ${opponent.name}`;
+          yield* displayYield`You killed ${opponent.name}`;
           return;
         }
 
         const opDmg = yield* opStrike;
-        yield* display`${opponent.name}, strikes you, dealing ${opDmg} damage.`;
+        yield* display`${opponent.name}, strikes you back, dealing ${opDmg} damage.`;
+
+        yield* newLine;
 
         yield* fightStats;
       }),
@@ -264,11 +284,13 @@ const fight = Effect.fn("fight")(function* () {
         Effect.tap((lost) => Player.updateGold((g) => Math.max(0, g - lost))),
         Effect.flatMap((lost) => display`You escape, losing ${lost} gold`),
       ),
-    });
+    })();
 
     yield* newLine;
   }
 
+  yield* clearScreen;
+  yield* forestBackMsg;
   yield* forest();
 });
 
@@ -289,5 +311,5 @@ const inn = Effect.fn("inn")(function* (): any {
       Effect.zipRight(townSquareIntro),
       Effect.zipRight(townSquare()),
     ),
-  });
+  })();
 });

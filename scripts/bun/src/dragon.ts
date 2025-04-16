@@ -7,9 +7,11 @@ type Weapon = keyof typeof weapons;
 
 type Eq = { weapon: Weapon };
 
+type PlayerClass = "mage" | "assassin" | "warrior" | "archer";
+
 const maxHealth = (level: number) => 20 + (level - 1) * 2;
 
-const requiredLvlExp = [200, 500, 700, 1000, 2000];
+const requiredLvlExp = [50, 100, 170, 250, 400];
 
 const getExpRequiredForLvl = (lvl: number) =>
   requiredLvlExp[Math.min(lvl - 1, requiredLvlExp.length - 1)];
@@ -41,7 +43,9 @@ export class Player extends Effect.Service<Player>()("Player", {
       eq: Eq;
       gold: number;
       exp: number;
+      class: PlayerClass;
     }>({
+      class: "warrior",
       name: "Player",
       health: maxHealth(startingLvl),
       eq: { weapon: "stick" },
@@ -57,13 +61,21 @@ export class Player extends Effect.Service<Player>()("Player", {
   static data = this.use((s) => s);
 
   static name = Effect.map(this.data, (d) => d.name);
+  static class = Effect.map(this.data, (d) => d.class);
 
   static eq = Effect.map(this.data, (d) => d.eq);
+  static weapon = Effect.map(this.data, (d) => d.eq.weapon);
 
   static level = Effect.map(this.data, (d) => lvlByExp(d.exp));
   static exp = Effect.map(this.data, (d) => d.exp);
+  // returns how many level-ups did player get
   static addExp = (e: number) =>
-    this.use((d) => Ref.update(d, (o) => ({ ...o, exp: o.exp + e })));
+    this.use((d) =>
+      Ref.modify(d, (o) => [
+        lvlByExp(o.exp + e) - lvlByExp(o.exp),
+        { ...o, exp: o.exp + e },
+      ]),
+    );
 
   static gold = Effect.map(this.data, (d) => d.gold);
   static updateGold = (fn: (o: number) => number) =>
@@ -148,7 +160,9 @@ const choice = <A, E, R, C extends Record<string, Effect.Effect<A, E, R>>>(
       choices,
     )
       .map((c) => c.toUpperCase())
-      .join(",")}]: ${opts.defaultOption ? `(${opts.defaultOption})` : ""}`;
+      .join(
+        ",",
+      )}]: ${opts.defaultOption ? `(${opts.defaultOption.toUpperCase()})` : ""}`;
 
     while (!(input in choices)) {
       yield* prompt;
@@ -182,7 +196,7 @@ const game = Effect.gen(function* (): any {
   yield* Effect.sleep(2000);
 
   yield* game;
-}).pipe(Effect.provide(Player.Default));
+});
 
 const restartGameIfPlayerIsDead = Effect.gen(function* () {
   if (yield* Player.isAlive) {
@@ -196,8 +210,47 @@ const restartGameIfPlayerIsDead = Effect.gen(function* () {
   yield* game;
 });
 
+const gameSetup = Effect.gen(function* () {
+  const terminal = yield* Terminal.Terminal;
+  const ref = yield* Player;
+
+  yield* display`Welcome to the dragon game`;
+  yield* newLine;
+  yield* display`What's your name?`;
+
+  const readName: Effect.Effect<string, never, Terminal.Terminal> =
+    terminal.readLine.pipe(
+      Effect.flatMap(
+        Schema.decode(
+          Schema.Trim.pipe(Schema.nonEmptyString(), Schema.maxLength(100)),
+        ),
+      ),
+      Effect.tapError(() => display`Your name cannot be empty`),
+      Effect.orElse(() => readName),
+    );
+
+  const userName = yield* readName;
+  yield* Ref.update(ref, (data) => ({ ...data, name: userName }));
+
+  yield* display`
+    Hello, ${userName}!
+
+    What is your class?
+      [M] mage
+      [A] assassin
+      [W] warrior
+      [R] archer`;
+
+  yield* choice({
+    m: Ref.update(ref, (data) => ({ ...data, class: "mage" as const })),
+    a: Ref.update(ref, (data) => ({ ...data, class: "assassin" as const })),
+    w: Ref.update(ref, (data) => ({ ...data, class: "warrior" as const })),
+    r: Ref.update(ref, (data) => ({ ...data, class: "archer" as const })),
+  })();
+});
+
 export const dragon = Command.make("dragon", {}, ({}) => {
-  return game;
+  return gameSetup.pipe(Effect.zipRight(game), Effect.provide(Player.Default));
 });
 
 const townSquareIntro = Effect.zipRight(
@@ -209,13 +262,13 @@ const townSquareIntro = Effect.zipRight(
 
 const townSquare = Effect.fn("townSquare")(function* (): any {
   yield* display`
-  [F] go to the forest
-  [W] swords and armours
-  [H] town's healer
-  [B] bank
-  [I] the inn
-  [S] show stats
-  [Q] quit the game`;
+  [F] Go to the forest
+  [W] Swords and armours
+  [H] Town's healer
+  [B] Bank
+  [I] The inn
+  [S] Show stats
+  [Q] Quit the game`;
   yield* newLine;
 
   yield* choice({
@@ -240,10 +293,13 @@ const stats = Effect.fn("stats")(function* () {
   const level = yield* Player.level;
 
   yield* display`
+    Name: ${yield* Player.name}
+    Class: ${yield* Player.class}
     Health: ${yield* Player.health}/${yield* Player.maxHealth}
     Level: ${level}
     Exp: ${yield* Player.exp}/${getExpRequiredForLvl(level)}
     Equipped weapon: ${yield* Effect.map(Player.eq, (eq) => eq.weapon)}
+    Gold: ${yield* Player.gold}
   `;
 
   yield* newLine;
@@ -279,9 +335,9 @@ const forest = Effect.fn("forest")(function* (): any {
 
 const fight = Effect.fn("fight")(function* () {
   const opponents: { name: string; power: number; maxHealth: number }[] = [
-    { name: "Small Goblin", power: 3, maxHealth: 5 },
-    { name: "Medium Goblin", power: 5, maxHealth: 7 },
-    { name: "Big Goblin", power: 7, maxHealth: 10 },
+    { name: "Small Goblin", power: 2, maxHealth: 5 },
+    { name: "Medium Goblin", power: 3, maxHealth: 7 },
+    { name: "Big Goblin", power: 5, maxHealth: 10 },
   ];
 
   const randomOpponent = Random.nextIntBetween(0, opponents.length).pipe(
@@ -296,12 +352,13 @@ const fight = Effect.fn("fight")(function* () {
 
   const lvl = yield* Player.level;
 
-  const playerStrike = Random.nextIntBetween(1, lvl * 3).pipe(
-    Effect.tap((dmg) => Ref.update(opRef, (h) => h - dmg)),
-  );
+  const playerStrike = Random.nextIntBetween(
+    1,
+    lvl * 3 + weapons[yield* Player.weapon],
+  ).pipe(Effect.tap((dmg) => Ref.update(opRef, (h) => Math.max(h - dmg))));
 
   const opStrike = Random.nextIntBetween(1, opponent.power).pipe(
-    Effect.tap((dmg) => Player.updateHealth((h) => h - dmg)),
+    Effect.tap((dmg) => Player.updateHealth((h) => Math.max(0, h - dmg))),
   );
 
   const opIsAlive = Effect.map(opRef, (h) => h > 0);
@@ -311,6 +368,7 @@ const fight = Effect.fn("fight")(function* () {
       ${yield* Player.name}: ${yield* Player.health}/${yield* Player.maxHealth}
       ${opponent.name}: ${yield* opRef}/${opponent.maxHealth}`;
   });
+  const continueAfter = Effect.all([clearScreen, forestBackMsg, forest()]);
 
   yield* clearScreen;
 
@@ -366,6 +424,7 @@ const fight = Effect.fn("fight")(function* () {
       r: Random.nextIntBetween(3, 6).pipe(
         Effect.tap((lost) => Player.updateGold((g) => Math.max(0, g - lost))),
         Effect.flatMap((lost) => display`You escape, losing ${lost} gold`),
+        Effect.zipRight(continueAfter),
       ),
     })({ defaultOption: "s" });
 
@@ -382,18 +441,19 @@ const fight = Effect.fn("fight")(function* () {
       Math.round(opponent.power * 1.5),
     );
 
-    yield* Player.addExp(gainedExp);
+    const gainedLevels = yield* Player.addExp(gainedExp);
     yield* Player.updateGold((g) => g + gainedGold);
     yield* display`You killed ${opponent.name} gaining ${gainedExp} exp and ${gainedGold} gold`;
+    if (gainedLevels > 0) {
+      yield* display`You gained a new level: LEVEL ${yield* Player.level}`;
+    }
     yield* newLine;
     yield* displayYield();
   }
 
   yield* restartGameIfPlayerIsDead;
 
-  yield* clearScreen;
-  yield* forestBackMsg;
-  yield* forest();
+  yield* continueAfter;
 });
 
 const innIntro = display`Welcome to the Town's Inn, it's awfully crowded today`;

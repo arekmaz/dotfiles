@@ -7,8 +7,30 @@ type Weapon = keyof typeof weapons;
 
 type Eq = { weapon: Weapon };
 
-const startingLevel = 1;
 const maxHealth = (level: number) => 20 + (level - 1) * 2;
+
+const requiredLvlExp = [200, 500, 700, 1000, 2000];
+
+const getExpRequiredForLvl = (lvl: number) =>
+  requiredLvlExp[Math.min(lvl - 1, requiredLvlExp.length - 1)];
+
+const lvlByExp = (exp: number) => {
+  let result = 0;
+  let expLeft = exp;
+
+  for (const required of requiredLvlExp) {
+    result++;
+    if (expLeft < required) {
+      return result;
+    }
+    expLeft -= required;
+  }
+
+  return result;
+};
+
+const startingExp = 2000;
+const startingLevel = lvlByExp(startingExp);
 
 export class Player extends Effect.Service<Player>()("Player", {
   effect: Effect.gen(function* () {
@@ -18,12 +40,16 @@ export class Player extends Effect.Service<Player>()("Player", {
       level: number;
       eq: Eq;
       gold: number;
+      exp: number;
     }>({
       name: "Player",
       health: maxHealth(startingLevel),
       level: startingLevel,
       eq: { weapon: "stick" },
       gold: 500,
+      exp:
+        startingExp -
+        requiredLvlExp.slice(0, startingLevel - 1).reduce((a, b) => a + b, 0),
     });
 
     return data;
@@ -36,6 +62,7 @@ export class Player extends Effect.Service<Player>()("Player", {
   static eq = Effect.map(this.data, (d) => d.eq);
 
   static level = Effect.map(this.data, (d) => d.level);
+  static exp = Effect.map(this.data, (d) => d.exp);
 
   static gold = Effect.map(this.data, (d) => d.gold);
   static updateGold = (fn: (o: number) => number) =>
@@ -167,10 +194,12 @@ const townSquare = Effect.fn("townSquare")(function* (): any {
 const stats = Effect.fn("stats")(function* () {
   yield* display`Stats:`;
   yield* newLine;
+  const level = yield* Player.level;
 
   yield* display`
     Health: ${yield* Player.health}/${yield* Player.maxHealth}
-    Level: ${yield* Player.level}
+    Level: ${level}
+    Exp: ${yield* Player.exp}/${getExpRequiredForLvl(level)}
     Equipped weapon: ${yield* Effect.map(Player.eq, (eq) => eq.weapon)}
   `;
 

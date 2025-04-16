@@ -78,7 +78,10 @@ export class Player extends Effect.Service<Player>()("Player", {
 
 const displayLines = (s: string | TemplateStringsArray, ...args: any[]) => {
   if (typeof s === "string") {
-    return s.replace(/^([\s\r\n])+/gm, "").replace(/\n?$/, "\n");
+    return s
+      .replace(/^[\n\r]+/, "")
+      .replace(/^([\s])+/gm, "")
+      .replace(/\n?$/, "\n");
   }
 
   let result = "";
@@ -92,7 +95,10 @@ const displayLines = (s: string | TemplateStringsArray, ...args: any[]) => {
     result += args[i - 1] + s[i];
   }
 
-  return result.replace(/^([\s\r\n])+/gm, "").replace(/\n?$/, "\n");
+  return result
+    .replace(/^[\n\r]+/, "")
+    .replace(/^([ ])+/gm, "")
+    .replace(/\n?$/, "\n");
 };
 
 const display = Effect.fn("display")(function* (
@@ -104,12 +110,16 @@ const display = Effect.fn("display")(function* (
 });
 
 const displayYield = Effect.fn("displayYield")(function* (
-  s: string | TemplateStringsArray = `Press <ENTER> to continue`,
+  s?: string | TemplateStringsArray,
   ...args: any[]
 ) {
   const terminal = yield* Terminal.Terminal;
 
-  yield* display(s, ...args);
+  if (s !== undefined) {
+    yield* display(s, ...args);
+  }
+
+  yield* display(`Press <ENTER> to continue`);
   while (true) {
     const input = yield* terminal.readInput;
 
@@ -252,9 +262,10 @@ const forestBackMsg = Effect.zipRight(
 const forest = Effect.fn("forest")(function* (): any {
   yield* display`
     What do you do next?
-  [L] look for something to kill
-  [S] show stats
-  [R] return to the town square`;
+
+    [L] look for something to kill
+    [S] show stats
+    [R] return to the town square`;
 
   yield* choice({
     l: fight(),
@@ -407,7 +418,10 @@ const inn = Effect.fn("inn")(function* (): any {
 
 const healthPointCost = 5;
 const healerIntro = display`Welcome to the healer's office, he'll service you right away
-The cost is ${healthPointCost} gold for every 1 point of health restored`;
+The cost is ${healthPointCost} gold for every 1 point of health restored
+
+What do you need?
+  `;
 
 const healer = Effect.fn("healer")(function* (): any {
   const playerMaxHealth = yield* Player.maxHealth;
@@ -479,7 +493,6 @@ const healer = Effect.fn("healer")(function* (): any {
 
   yield* newLine;
   yield* display`
-    What do you do next?
   [H] heal as much as possible with your gold
   [A] heal a speficied amount of points
   [S] show stats

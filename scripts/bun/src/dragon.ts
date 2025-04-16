@@ -9,12 +9,19 @@ type Eq = { weapon: Weapon };
 
 export class Player extends Effect.Service<Player>()("Player", {
   effect: Effect.gen(function* () {
-    const data = yield* Ref.make<{ health: number; level: number; eq: Eq }>({
+    const data = yield* Ref.make<{
+      name: string;
+      health: number;
+      level: number;
+      eq: Eq;
+    }>({
+      name: "Player",
       health: 20,
       level: 1,
       eq: { weapon: "stick" },
     });
 
+    const name = Effect.map(data, (d) => d.name);
     const level = Effect.map(data, (d) => d.level);
 
     const maxHealth = Effect.map(data, (d) => d.level * 2 + 10);
@@ -26,9 +33,10 @@ export class Player extends Effect.Service<Player>()("Player", {
 
     const eq = Effect.map(data, (d) => d.eq);
 
-    return { updateHealth, health, level, maxHealth, eq };
+    return { updateHealth, health, level, maxHealth, eq, name };
   }),
 }) {
+  static name = this.use((s) => s.name);
   static eq = this.use((s) => s.eq);
   static health = this.use((s) => s.health);
   static maxHealth = this.use((s) => s.maxHealth);
@@ -181,11 +189,11 @@ const forest = Effect.fn("forest")(function* (): any {
 });
 
 const fight = Effect.fn("fight")(function* () {
-  const opponent = { name: "Small Goblin", power: 2, health: 5 };
+  const opponent = { name: "Small Goblin", power: 2, maxHealth: 5 };
 
-  const opRef = yield* Ref.make(opponent.health);
+  const opRef = yield* Ref.make(opponent.maxHealth);
 
-  const intro = display`You meet ${opponent.name}, power ${opponent.power}, health: ${opponent.health}`;
+  const intro = display`You meet ${opponent.name}, power ${opponent.power}, health: ${yield* opRef}/${opponent.maxHealth}`;
 
   const lvl = yield* Player.level;
 
@@ -197,8 +205,12 @@ const fight = Effect.fn("fight")(function* () {
     Effect.tap((dmg) => Player.use((s) => s.updateHealth((h) => h - dmg))),
   );
 
-  yield* intro;
+  const fightStats = display`
+      ${yield* Player.name}: ${yield* Player.health}/${yield* Player.maxHealth}
+      ${opponent.name}: ${yield* opRef}/${opponent.maxHealth}
+    `;
 
+  yield* intro;
   yield* newLine;
 
   yield* Random.nextBoolean.pipe(
@@ -215,7 +227,14 @@ const fight = Effect.fn("fight")(function* () {
           ),
     ),
   );
-  yield* newLine;
+
+  while (false && (yield* opRef) > 0 && (yield* Player.health) > 0) {
+    yield* newLine;
+
+    yield* newLine;
+
+    yield* fightStats;
+  }
 
   yield* forest();
 });

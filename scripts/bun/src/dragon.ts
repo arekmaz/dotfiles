@@ -75,12 +75,11 @@ const display = Effect.fn("display")(function* (
 });
 
 const displayYield = Effect.fn("displayYield")(function* (
-  s: string | TemplateStringsArray,
+  s: string | TemplateStringsArray = `Press <ENTER> to continue`,
   ...args: any[]
 ) {
   const terminal = yield* Terminal.Terminal;
   yield* display(s, ...args);
-  yield* display`Press <ENTER> to continue`;
   yield* terminal.readInput;
 });
 
@@ -178,10 +177,13 @@ const stats = Effect.fn("stats")(function* () {
   yield* newLine;
 });
 
-const forestIntro = Effect.zipRight(display`You arrive at the forest`, newLine);
+const forestIntro = Effect.zipRight(
+  display`You arrive at the deep dark forest`,
+  newLine,
+);
 
 const forestBackMsg = Effect.zipRight(
-  display`You are back at the deep dark forest`,
+  display`You are back at the forest`,
   newLine,
 );
 
@@ -267,7 +269,10 @@ const fight = Effect.fn("fight")(function* () {
         yield* display`You strike ${opponent.name}, dealing ${dmg} damage.`;
 
         if ((yield* opRef) <= 0) {
-          yield* displayYield`You killed ${opponent.name}`;
+          yield* newLine;
+          yield* display`You killed ${opponent.name}`;
+          yield* newLine;
+          yield* displayYield();
           return;
         }
 

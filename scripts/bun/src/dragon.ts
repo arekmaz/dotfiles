@@ -54,9 +54,11 @@ const choice = Effect.fn("choice")(function* <
 });
 
 const quit = Effect.sync(() => process.exit(0));
+const clearScreen = Effect.sync(console.clear);
 
 export const dragon = Command.make("dragon", {}, ({}) => {
   const game = Effect.gen(function* (): any {
+    yield* clearScreen
     yield* display`Game started`;
     yield* newLine;
 
@@ -67,6 +69,7 @@ export const dragon = Command.make("dragon", {}, ({}) => {
     yield* newLine;
     yield* display`-------------`;
     yield* newLine;
+    yield* Effect.sleep(2000)
 
     yield* game;
   });
@@ -74,10 +77,11 @@ export const dragon = Command.make("dragon", {}, ({}) => {
   return game;
 });
 
-const townSquare = Effect.fn("townSquare")(function* () {
-  yield* display`
+const townSquareIntro = display`
   Welcome to the Town Square, where do you want to go?
   `;
+
+const townSquare = Effect.fn("townSquare")(function* (): any {
   yield* newLine;
   yield* display`
   [F] go to the forest
@@ -89,11 +93,11 @@ const townSquare = Effect.fn("townSquare")(function* () {
   yield* newLine;
 
   yield* choice({
-    f: forest(),
-    b: display`shop`,
-    h: display`healer`,
-    i: display`the inn`,
-    s: stats(),
+    f: forestIntro.pipe(Effect.zipRight(forest())),
+    b: display`shop`.pipe(Effect.zipRight(townSquare())),
+    h: display`healer`.pipe(Effect.zipRight(townSquare())),
+    i: display`the inn`.pipe(Effect.zipRight(townSquare())),
+    s: stats().pipe(Effect.zipRight(townSquare())),
     q: display`quitting...`.pipe(Effect.zipRight(quit)),
   });
 });
@@ -102,8 +106,9 @@ const stats = Effect.fn("stats")(function* () {
   yield* display`Stats`;
 });
 
+const forestIntro = display`You arrive at the deep dark forest`;
+
 const forest = Effect.fn("forest")(function* (): any {
-  yield* display`You arrive at the deep dark forest`;
   yield* display``;
   yield* display`
     What do you do next?
@@ -112,8 +117,8 @@ const forest = Effect.fn("forest")(function* (): any {
   [R] return to the town square`;
 
   yield* choice({
-    l: display`looking`,
-    s: stats(),
-    r: townSquare(),
+    l: display`looking`.pipe(Effect.zipRight(forest())),
+    s: stats().pipe(Effect.zipRight(forest())),
+    r: townSquareIntro.pipe(Effect.zipRight(townSquare())),
   });
 });

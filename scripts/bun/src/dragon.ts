@@ -1,6 +1,6 @@
 import { Command } from "@effect/cli";
 import { Terminal } from "@effect/platform";
-import { Effect, Random, Ref } from "effect";
+import { Effect, Random, Ref, Schema } from "effect";
 
 const weapons = { stick: 2, dagger: 5 };
 type Weapon = keyof typeof weapons;
@@ -30,26 +30,25 @@ const lvlByExp = (exp: number) => {
 };
 
 const startingExp = 0;
-const startingLevel = lvlByExp(startingExp);
 
 export class Player extends Effect.Service<Player>()("Player", {
   effect: Effect.gen(function* () {
+    const startingLvl = lvlByExp(startingExp);
+
     const data = yield* Ref.make<{
       name: string;
       health: number;
-      level: number;
       eq: Eq;
       gold: number;
       exp: number;
     }>({
       name: "Player",
-      health: maxHealth(startingLevel),
-      level: startingLevel,
+      health: maxHealth(startingLvl),
       eq: { weapon: "stick" },
       gold: 500,
       exp:
         startingExp -
-        requiredLvlExp.slice(0, startingLevel - 1).reduce((a, b) => a + b, 0),
+        requiredLvlExp.slice(0, startingLvl - 1).reduce((a, b) => a + b, 0),
     });
 
     return data;
@@ -61,15 +60,18 @@ export class Player extends Effect.Service<Player>()("Player", {
 
   static eq = Effect.map(this.data, (d) => d.eq);
 
-  static level = Effect.map(this.data, (d) => d.level);
+  static level = Effect.map(this.data, (d) => lvlByExp(d.exp));
   static exp = Effect.map(this.data, (d) => d.exp);
+  static addExp = (e: number) =>
+    this.use((d) => Ref.update(d, (o) => ({ ...o, exp: o.exp + e })));
 
   static gold = Effect.map(this.data, (d) => d.gold);
   static updateGold = (fn: (o: number) => number) =>
     this.use((d) => Ref.update(d, (o) => ({ ...o, gold: fn(o.gold) })));
 
   static health = Effect.map(this.data, (d) => d.health);
-  static maxHealth = Effect.map(this.data, (d) => maxHealth(d.level));
+  static isAlive = Effect.map(this.data, (d) => d.health > 0);
+  static maxHealth = Effect.map(this.data, (d) => maxHealth(lvlByExp(d.exp)));
   static updateHealth = (fn: (o: number) => number) =>
     this.use((d) => Ref.update(d, (o) => ({ ...o, health: fn(o.health) })));
 }
@@ -154,25 +156,37 @@ const choice = <A, E, R, C extends Record<string, Effect.Effect<A, E, R>>>(
 const quit = Effect.sync(() => process.exit(0));
 const clearScreen = Effect.sync(console.clear);
 
+const game = Effect.gen(function* (): any {
+  yield* clearScreen;
+  yield* display`Game started`;
+  yield* newLine;
+
+  yield* townSquareIntro;
+  yield* townSquare();
+
+  yield* newLine;
+  yield* display`Game finished`;
+  yield* newLine;
+  yield* display`-------------`;
+  yield* newLine;
+  yield* Effect.sleep(2000);
+
+  yield* game;
+}).pipe(Effect.provide(Player.Default));
+
+const restartGameIfPlayerIsDead = Effect.gen(function* () {
+  if (yield* Player.isAlive) {
+    return;
+  }
+
+  yield* Player.updateGold(() => 0);
+  const maxHealth = yield* Player.maxHealth;
+  yield* Player.updateHealth(() => maxHealth);
+  yield* displayYield`You died, you lost your gold, the game will restart`;
+  yield* game;
+});
+
 export const dragon = Command.make("dragon", {}, ({}) => {
-  const game = Effect.gen(function* (): any {
-    yield* clearScreen;
-    yield* display`Game started`;
-    yield* newLine;
-
-    yield* townSquareIntro;
-    yield* townSquare();
-
-    yield* newLine;
-    yield* display`Game finished`;
-    yield* newLine;
-    yield* display`-------------`;
-    yield* newLine;
-    yield* Effect.sleep(2000);
-
-    yield* game;
-  }).pipe(Effect.provide(Player.Default));
-
   return game;
 });
 
@@ -186,8 +200,9 @@ const townSquareIntro = Effect.zipRight(
 const townSquare = Effect.fn("townSquare")(function* (): any {
   yield* display`
   [F] go to the forest
-  [B] swords and armours
+  [W] swords and armours
   [H] town's healer
+  [B] bank
   [I] the inn
   [S] show stats
   [Q] quit the game`;
@@ -198,15 +213,13 @@ const townSquare = Effect.fn("townSquare")(function* (): any {
       Effect.zipRight(forestIntro),
       Effect.zipRight(forest()),
     ),
-    b: display`shop`.pipe(Effect.zipRight(townSquare())),
-    h: display`healer`.pipe(Effect.zipRight(townSquare())),
-    i: clearScreen.pipe(
-      Effect.zipRight(innIntro),
-      Effect.zipRight(townSquare()),
-    ),
+    w: display`shop`.pipe(Effect.zipRight(townSquare())),
+    b: display`bank`.pipe(Effect.zipRight(townSquare())),
+    h: Effect.all([clearScreen, healerIntro, healer(), townSquare()]),
+    i: Effect.all([clearScreen, innIntro, inn(), townSquare()]),
     s: stats().pipe(Effect.zipRight(townSquare())),
     q: display`quitting...`.pipe(Effect.zipRight(quit)),
-  })();
+  })({ defaultOption: "s" });
 });
 
 const stats = Effect.fn("stats")(function* () {
@@ -250,11 +263,21 @@ const forest = Effect.fn("forest")(function* (): any {
       Effect.zipRight(townSquareIntro),
       Effect.zipRight(townSquare()),
     ),
-  })();
+  })({ defaultOption: "s" });
 });
 
 const fight = Effect.fn("fight")(function* () {
-  const opponent = { name: "Small Goblin", power: 2, maxHealth: 5 };
+  const opponents: { name: string; power: number; maxHealth: number }[] = [
+    { name: "Small Goblin", power: 3, maxHealth: 5 },
+    { name: "Medium Goblin", power: 5, maxHealth: 7 },
+    { name: "Big Goblin", power: 7, maxHealth: 10 },
+  ];
+
+  const randomOpponent = Random.nextIntBetween(0, opponents.length).pipe(
+    Effect.map((i) => opponents[i]),
+  );
+
+  const opponent = yield* randomOpponent;
 
   const opRef = yield* Ref.make(opponent.maxHealth);
 
@@ -271,7 +294,6 @@ const fight = Effect.fn("fight")(function* () {
   );
 
   const opIsAlive = Effect.map(opRef, (h) => h > 0);
-  const playerIsAlive = Effect.map(Player.health, (h) => h > 0);
 
   const fightStats = Effect.gen(function* () {
     yield* display`
@@ -305,7 +327,7 @@ const fight = Effect.fn("fight")(function* () {
 
   yield* newLine;
 
-  while ((yield* playerIsAlive) && (yield* opIsAlive)) {
+  while ((yield* Player.isAlive) && (yield* opIsAlive)) {
     yield* display`
     What do you do next?
   [A] Attack
@@ -334,16 +356,29 @@ const fight = Effect.fn("fight")(function* () {
         Effect.tap((lost) => Player.updateGold((g) => Math.max(0, g - lost))),
         Effect.flatMap((lost) => display`You escape, losing ${lost} gold`),
       ),
-    })();
+    })({ defaultOption: "s" });
 
     yield* newLine;
   }
 
   if (!(yield* opIsAlive)) {
-    yield* display`You killed ${opponent.name}`;
+    const gainedExp = yield* Random.nextIntBetween(
+      Math.round(opponent.maxHealth * 0.5),
+      Math.round(opponent.maxHealth * 1.5),
+    );
+    const gainedGold = yield* Random.nextIntBetween(
+      Math.round(opponent.power * 0.5),
+      Math.round(opponent.power * 1.5),
+    );
+
+    yield* Player.addExp(gainedExp);
+    yield* Player.updateGold((g) => g + gainedGold);
+    yield* display`You killed ${opponent.name} gaining ${gainedExp} exp and ${gainedGold} gold`;
     yield* newLine;
     yield* displayYield();
   }
+
+  yield* restartGameIfPlayerIsDead;
 
   yield* clearScreen;
   yield* forestBackMsg;
@@ -367,5 +402,108 @@ const inn = Effect.fn("inn")(function* (): any {
       Effect.zipRight(townSquareIntro),
       Effect.zipRight(townSquare()),
     ),
-  })();
+  })({ defaultOption: "s" });
+});
+
+const healthPointCost = 5;
+const healerIntro = display`Welcome to the healer's office, he'll service you right away
+The cost is ${healthPointCost} gold for every 1 point of health restored`;
+
+const healer = Effect.fn("healer")(function* (): any {
+  const playerMaxHealth = yield* Player.maxHealth;
+
+  const healFull = Player.pipe(
+    Effect.flatMap((ref) =>
+      Ref.modify(ref, (data) => {
+        const healthToRestore = playerMaxHealth - data.health;
+
+        if (data.gold >= healthToRestore * healthPointCost) {
+          const cost = healthToRestore * healthPointCost;
+          return [
+            {
+              restoredHealth: healthToRestore,
+              cost,
+            },
+            { ...data, health: playerMaxHealth, gold: data.gold - cost },
+          ];
+        }
+
+        const maxHealthRestorable = Math.floor(data.gold / healthPointCost);
+        const cost = maxHealthRestorable * healthPointCost;
+
+        return [
+          {
+            restoredHealth: maxHealthRestorable,
+            cost,
+          },
+          { ...data, health: playerMaxHealth, gold: data.gold - cost },
+        ];
+      }),
+    ),
+  );
+
+  const healSpecified = Effect.gen(function* () {
+    const terminal = yield* Terminal.Terminal;
+    const data = yield* Player.data;
+    const maxPointsAffordable = Math.min(
+      Math.floor(data.gold / healthPointCost),
+      playerMaxHealth - data.health,
+    );
+    yield* display`Enter the amount of health points (you can restore max ${maxPointsAffordable} points):`;
+
+    const readAmount: Effect.Effect<number, never, Terminal.Terminal> =
+      terminal.readLine.pipe(
+        Effect.flatMap(
+          Schema.decode(
+            Schema.NumberFromString.pipe(
+              Schema.int(),
+              Schema.between(0, maxPointsAffordable),
+            ),
+          ),
+        ),
+        Effect.tapError(
+          () =>
+            display`Incorrect amount, enter a number between 0-${maxPointsAffordable}`,
+        ),
+        Effect.orElse(() => readAmount),
+      );
+
+    const healthToRestore = yield* readAmount;
+    const cost = healthToRestore * healthPointCost;
+
+    yield* Player.updateGold((g) => g - cost);
+    yield* Player.updateHealth((h) => h + healthToRestore);
+
+    return { restoredHealth: healthToRestore, cost };
+  });
+
+  yield* newLine;
+  yield* display`
+    What do you do next?
+  [H] heal as much as possible with your gold
+  [A] heal a speficied amount of points
+  [S] show stats
+  [R] return to the town square`;
+
+  yield* choice({
+    h: healFull.pipe(
+      Effect.tap(
+        ({ cost, restoredHealth }) =>
+          display`Restored ${restoredHealth}, ${cost} gold paid`,
+      ),
+      Effect.zipRight(inn()),
+    ),
+    a: healSpecified.pipe(
+      Effect.tap(
+        ({ cost, restoredHealth }) =>
+          display`Restored ${restoredHealth}, ${cost} gold paid`,
+      ),
+      Effect.zipRight(inn()),
+    ),
+    s: stats().pipe(Effect.zipRight(inn())),
+    r: clearScreen.pipe(
+      Effect.zipRight(townSquareIntro),
+      Effect.zipRight(townSquare()),
+    ),
+  })({ defaultOption: "s" });
 });

@@ -1,6 +1,6 @@
 import { Command } from "@effect/cli";
 import { Terminal } from "@effect/platform";
-import { Effect, identity, Ref } from "effect";
+import { Effect, identity, Random, Ref } from "effect";
 
 const weapons = { stick: 2, dagger: 5 };
 type Weapon = keyof typeof weapons;
@@ -171,13 +171,36 @@ const forest = Effect.fn("forest")(function* (): any {
   [R] return to the town square`;
 
   yield* choice({
-    l: display`looking`.pipe(Effect.zipRight(forest())),
+    l: fight(),
     s: stats().pipe(Effect.zipRight(forest())),
     r: clearScreen.pipe(
       Effect.zipRight(townSquareIntro),
       Effect.zipRight(townSquare()),
     ),
   });
+});
+
+const fight = Effect.fn("fight")(function* () {
+  const opponent = { name: "Small Goblin", power: 2, health: 5 };
+
+  const opRef = yield* Ref.make(opponent);
+
+  const intro = display`You meet ${opponent.name}, power ${opponent.power}, health: ${opponent.health}`;
+
+  yield* intro;
+
+  yield* newLine;
+
+  yield* Random.nextBoolean.pipe(
+    Effect.flatMap((playerStarts) =>
+      playerStarts
+        ? display`You manage to strike it first, dealing damage`
+        : display`It suprises you, dealing you damage`,
+    ),
+  );
+  yield* newLine;
+
+  yield* forest();
 });
 
 const innIntro = display`Welcome to the Town's Inn, it's awfully crowded today`;

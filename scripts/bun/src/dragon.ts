@@ -484,6 +484,7 @@ const healer = Effect.fn("healer")(function* (): any {
   [A] heal a speficied amount of points
   [S] show stats
   [R] return to the town square`;
+  yield* newLine;
 
   yield* choice({
     h: healFull.pipe(
@@ -491,16 +492,16 @@ const healer = Effect.fn("healer")(function* (): any {
         ({ cost, restoredHealth }) =>
           display`Restored ${restoredHealth}, ${cost} gold paid`,
       ),
-      Effect.zipRight(inn()),
+      Effect.zipRight(healer()),
     ),
     a: healSpecified.pipe(
       Effect.tap(
         ({ cost, restoredHealth }) =>
           display`Restored ${restoredHealth}, ${cost} gold paid`,
       ),
-      Effect.zipRight(inn()),
+      Effect.zipRight(healer()),
     ),
-    s: stats().pipe(Effect.zipRight(inn())),
+    s: stats().pipe(Effect.zipRight(healer())),
     r: clearScreen.pipe(
       Effect.zipRight(townSquareIntro),
       Effect.zipRight(townSquare()),

@@ -2,12 +2,19 @@ import { Command } from "@effect/cli";
 import { Terminal } from "@effect/platform";
 import { Effect, identity, Ref } from "effect";
 
+const weapons = { stick: 2, dagger: 5 };
+type Weapon = keyof typeof weapons;
+
+type Eq = { weapon: Weapon };
+
 export class Player extends Effect.Service<Player>()("Player", {
   effect: Effect.gen(function* () {
-    const data = yield* Ref.make<{ health: number; level: number }>({
+    const data = yield* Ref.make<{ health: number; level: number; eq: Eq }>({
       health: 20,
       level: 1,
+      eq: { weapon: "stick" },
     });
+
     const level = Effect.map(data, (d) => d.level);
 
     const maxHealth = Effect.map(data, (d) => d.level * 2 + 10);
@@ -17,9 +24,16 @@ export class Player extends Effect.Service<Player>()("Player", {
     const updateHealth = (fn: (o: number) => number) =>
       Ref.update(data, (d) => ({ ...d, health: fn(d.health) }));
 
-    return { updateHealth, health, level, maxHealth };
+    const eq = Effect.map(data, (d) => d.eq);
+
+    return { updateHealth, health, level, maxHealth, eq };
   }),
-}) {}
+}) {
+  static eq = this.use((s) => s.eq);
+  static health = this.use((s) => s.health);
+  static maxHealth = this.use((s) => s.maxHealth);
+  static level = this.use((s) => s.level);
+}
 
 const displayLines = (s: string | TemplateStringsArray, ...args: any[]) => {
   if (typeof s === "string") {
@@ -135,11 +149,10 @@ const stats = Effect.fn("stats")(function* () {
   yield* display`Stats:`;
   yield* newLine;
 
-  const { health, level, maxHealth } = yield* Player.use(identity);
-
   yield* display`
-    Health: ${health}/${maxHealth}
-    Level: ${level}
+    Health: ${yield* Player.health}/${yield* Player.maxHealth}
+    Level: ${yield* Player.level}
+    Equipped weapon: ${yield* Effect.map(Player.eq, (eq) => eq.weapon)}
   `;
 
   yield* newLine;

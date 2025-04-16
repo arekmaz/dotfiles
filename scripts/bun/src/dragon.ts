@@ -1,10 +1,24 @@
 import { Command } from "@effect/cli";
 import { Terminal } from "@effect/platform";
-import { Effect } from "effect";
+import { Effect, Ref } from "effect";
 
-const home = Bun.env.HOME || "~";
+export class Player extends Effect.Service<Player>()("Player", {
+  effect: Effect.gen(function* () {
+    const data = yield* Ref.make<{ health: number }>({ health: 20 });
 
-const displayLines = (s: string | TemplateStringsArray, ...args: string[]) => {
+    return { data };
+  }),
+}) {
+  static data = Effect.flatMap(this, (s) => s.data);
+  static dataRef = Effect.map(this, (s) => s.data);
+  static health = Effect.map(this.data, (data) => data.health);
+  static updateHealth = (fn: (o: number) => number) =>
+    Effect.map(this.dataRef, (ref) =>
+      Ref.update(ref, (o) => ({ ...o, health: fn(o.health) })),
+    );
+}
+
+const displayLines = (s: string | TemplateStringsArray, ...args: any[]) => {
   if (typeof s === "string") {
     return s.replace(/^([\s\r\n])+/gm, "").replace(/\n?$/, "\n");
   }
@@ -25,7 +39,7 @@ const displayLines = (s: string | TemplateStringsArray, ...args: string[]) => {
 
 const display = Effect.fn("display")(function* (
   s: string | TemplateStringsArray,
-  ...args: string[]
+  ...args: any[]
 ) {
   const terminal = yield* Terminal.Terminal;
   yield* terminal.display(displayLines(s, ...args));
@@ -61,8 +75,8 @@ export const dragon = Command.make("dragon", {}, ({}) => {
     yield* clearScreen;
     yield* display`Game started`;
     yield* newLine;
-    
-    yield* townSquareIntro
+
+    yield* townSquareIntro;
     yield* townSquare();
 
     yield* newLine;
@@ -73,7 +87,7 @@ export const dragon = Command.make("dragon", {}, ({}) => {
     yield* Effect.sleep(2000);
 
     yield* game;
-  });
+  }).pipe(Effect.provide(Player.Default));
 
   return game;
 });
@@ -112,7 +126,9 @@ const townSquare = Effect.fn("townSquare")(function* (): any {
 });
 
 const stats = Effect.fn("stats")(function* () {
-  yield* display`Stats`;
+  yield* display`Stats:`;
+
+  yield* display`Health: ${yield* Player.health}`;
 });
 
 const forestIntro = Effect.zipRight(

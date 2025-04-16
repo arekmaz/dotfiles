@@ -183,9 +183,19 @@ const forest = Effect.fn("forest")(function* (): any {
 const fight = Effect.fn("fight")(function* () {
   const opponent = { name: "Small Goblin", power: 2, health: 5 };
 
-  const opRef = yield* Ref.make(opponent);
+  const opRef = yield* Ref.make(opponent.health);
 
   const intro = display`You meet ${opponent.name}, power ${opponent.power}, health: ${opponent.health}`;
+
+  const lvl = yield* Player.level;
+
+  const playerStrike = Random.nextIntBetween(1, lvl * 3).pipe(
+    Effect.tap((dmg) => Ref.update(opRef, (h) => h - dmg)),
+  );
+
+  const opStrike = Random.nextIntBetween(1, opponent.power).pipe(
+    Effect.tap((dmg) => Player.use((s) => s.updateHealth((h) => h - dmg))),
+  );
 
   yield* intro;
 
@@ -194,8 +204,15 @@ const fight = Effect.fn("fight")(function* () {
   yield* Random.nextBoolean.pipe(
     Effect.flatMap((playerStarts) =>
       playerStarts
-        ? display`You manage to strike it first, dealing damage`
-        : display`It suprises you, dealing you damage`,
+        ? Effect.flatMap(
+            playerStrike,
+            (dmg) =>
+              display`You manage to strike it first, dealing ${dmg} damage`,
+          )
+        : Effect.flatMap(
+            opStrike,
+            (dmg) => display`It suprises you, dealing you ${dmg} damage`,
+          ),
     ),
   );
   yield* newLine;

@@ -14,6 +14,7 @@ import { md2html } from "./md2html.ts";
 import * as misc from "./misc.ts";
 import { ed } from "./ed.ts";
 import { fileToPrompt } from "./file-to-prompt.ts";
+import { dragon } from "./dragon.ts";
 
 const command = Command.make(",m").pipe(
   Command.withSubcommands([
@@ -28,6 +29,7 @@ const command = Command.make(",m").pipe(
     md2html,
     ed,
     fileToPrompt,
+    dragon,
     ...Object.values(misc),
   ]),
 );

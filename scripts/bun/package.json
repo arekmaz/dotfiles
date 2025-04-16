@@ -7,13 +7,13 @@
     "@types/bun": "^1.1.14",
     "@types/ink": "^2.0.3",
     "@types/react": "^18.3.12",
-    "effect": "^3.10.19",
+    "effect": "^3.14.10",
     "ink": "^5.1.0",
     "react": "^18.3.1",
     "typescript": "^5.7.2"
   },
   "scripts": {
-     "bundle": "bun build --bundle --minify src/mb.ts --outfile dist/mb.js --target bun",
+    "bundle": "bun build --bundle --minify src/mb.ts --outfile dist/mb.js --target bun",
     "postbundle": "bun build/shim.ts && cp build/yoga.wasm dist",
     "compile": "bun build --minify --compile dist/mb.js --outfile bin/,m",
     "build": "bun run bundle && bun run compile"

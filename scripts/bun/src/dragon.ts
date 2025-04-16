@@ -58,10 +58,11 @@ const clearScreen = Effect.sync(console.clear);
 
 export const dragon = Command.make("dragon", {}, ({}) => {
   const game = Effect.gen(function* (): any {
-    yield* clearScreen
+    yield* clearScreen;
     yield* display`Game started`;
     yield* newLine;
-
+    
+    yield* townSquareIntro
     yield* townSquare();
 
     yield* newLine;
@@ -69,7 +70,7 @@ export const dragon = Command.make("dragon", {}, ({}) => {
     yield* newLine;
     yield* display`-------------`;
     yield* newLine;
-    yield* Effect.sleep(2000)
+    yield* Effect.sleep(2000);
 
     yield* game;
   });
@@ -77,12 +78,14 @@ export const dragon = Command.make("dragon", {}, ({}) => {
   return game;
 });
 
-const townSquareIntro = display`
+const townSquareIntro = Effect.zipRight(
+  display`
   Welcome to the Town Square, where do you want to go?
-  `;
+  `,
+  newLine,
+);
 
 const townSquare = Effect.fn("townSquare")(function* (): any {
-  yield* newLine;
   yield* display`
   [F] go to the forest
   [B] swords and armours
@@ -93,10 +96,16 @@ const townSquare = Effect.fn("townSquare")(function* (): any {
   yield* newLine;
 
   yield* choice({
-    f: forestIntro.pipe(Effect.zipRight(forest())),
+    f: clearScreen.pipe(
+      Effect.zipRight(forestIntro),
+      Effect.zipRight(forest()),
+    ),
     b: display`shop`.pipe(Effect.zipRight(townSquare())),
     h: display`healer`.pipe(Effect.zipRight(townSquare())),
-    i: display`the inn`.pipe(Effect.zipRight(townSquare())),
+    i: clearScreen.pipe(
+      Effect.zipRight(innIntro),
+      Effect.zipRight(townSquare()),
+    ),
     s: stats().pipe(Effect.zipRight(townSquare())),
     q: display`quitting...`.pipe(Effect.zipRight(quit)),
   });
@@ -106,10 +115,12 @@ const stats = Effect.fn("stats")(function* () {
   yield* display`Stats`;
 });
 
-const forestIntro = display`You arrive at the deep dark forest`;
+const forestIntro = Effect.zipRight(
+  display`You arrive at the deep dark forest`,
+  newLine,
+);
 
 const forest = Effect.fn("forest")(function* (): any {
-  yield* display``;
   yield* display`
     What do you do next?
   [L] look for something to kill
@@ -119,6 +130,29 @@ const forest = Effect.fn("forest")(function* (): any {
   yield* choice({
     l: display`looking`.pipe(Effect.zipRight(forest())),
     s: stats().pipe(Effect.zipRight(forest())),
-    r: townSquareIntro.pipe(Effect.zipRight(townSquare())),
+    r: clearScreen.pipe(
+      Effect.zipRight(townSquareIntro),
+      Effect.zipRight(townSquare()),
+    ),
+  });
+});
+
+const innIntro = display`Welcome to the Town's Inn, it's awfully crowded today`;
+
+const inn = Effect.fn("inn")(function* (): any {
+  yield* display``;
+  yield* display`
+    What do you do next?
+  [N] check town newsboard
+  [S] show stats
+  [R] return to the town square`;
+
+  yield* choice({
+    n: display`news board`.pipe(Effect.zipRight(inn())),
+    s: stats().pipe(Effect.zipRight(inn())),
+    r: clearScreen.pipe(
+      Effect.zipRight(townSquareIntro),
+      Effect.zipRight(townSquare()),
+    ),
   });
 });

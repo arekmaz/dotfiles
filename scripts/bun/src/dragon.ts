@@ -1,22 +1,25 @@
 import { Command } from "@effect/cli";
 import { Terminal } from "@effect/platform";
-import { Effect, Ref } from "effect";
+import { Effect, identity, Ref } from "effect";
 
 export class Player extends Effect.Service<Player>()("Player", {
   effect: Effect.gen(function* () {
-    const data = yield* Ref.make<{ health: number }>({ health: 20 });
+    const data = yield* Ref.make<{ health: number; level: number }>({
+      health: 20,
+      level: 1,
+    });
+    const level = Effect.map(data, (d) => d.level);
 
-    return { data };
+    const maxHealth = Effect.map(data, (d) => d.level * 2 + 10);
+
+    const health = Effect.map(data, (d) => d.health);
+
+    const updateHealth = (fn: (o: number) => number) =>
+      Ref.update(data, (d) => ({ ...d, health: fn(d.health) }));
+
+    return { updateHealth, health, level, maxHealth };
   }),
-}) {
-  static data = Effect.flatMap(this, (s) => s.data);
-  static dataRef = Effect.map(this, (s) => s.data);
-  static health = Effect.map(this.data, (data) => data.health);
-  static updateHealth = (fn: (o: number) => number) =>
-    Effect.map(this.dataRef, (ref) =>
-      Ref.update(ref, (o) => ({ ...o, health: fn(o.health) })),
-    );
-}
+}) {}
 
 const displayLines = (s: string | TemplateStringsArray, ...args: any[]) => {
   if (typeof s === "string") {
@@ -48,7 +51,10 @@ const display = Effect.fn("display")(function* (
 const newLine = display``;
 
 const choice = Effect.fn("choice")(function* <
-  C extends Record<string, Effect.Effect<any, any, any>>,
+  A,
+  E,
+  R,
+  C extends Record<string, Effect.Effect<A, E, R>>,
 >(choices: C) {
   const terminal = yield* Terminal.Terminal;
 
@@ -127,8 +133,16 @@ const townSquare = Effect.fn("townSquare")(function* (): any {
 
 const stats = Effect.fn("stats")(function* () {
   yield* display`Stats:`;
+  yield* newLine;
 
-  yield* display`Health: ${yield* Player.health}`;
+  const { health, level, maxHealth } = yield* Player.use(identity);
+
+  yield* display`
+    Health: ${health}/${maxHealth}
+    Level: ${level}
+  `;
+
+  yield* newLine;
 });
 
 const forestIntro = Effect.zipRight(

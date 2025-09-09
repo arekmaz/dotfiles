@@ -2,4 +2,4 @@
 
 # commit, push, and deploy fly.io project
 
-gwip && git push -u origin $(git branch --show-current) && fly deploy
+,gwip && git push -u origin $(git branch --show-current) && fly deploy

@@ -27,4 +27,4 @@ Temporary Items
 .apdisk
 
 *.code-workspace
-.vscode
+#.vscode

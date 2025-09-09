@@ -3,12 +3,14 @@ size = 18
 
 [font.normal]
 # family = "FiraCode Nerd Font"
-# family = "JetBrainsMono Nerd Font"
-# family = "Iosevka"
+#family = "JetBrainsMono Nerd Font"
+#family = "Iosevka"
 family = "Monaco Nerd Font"
+#family = "CaskaydiaMono Nerd Font Mono"
+#family = "VictorMono Nerd Font"
 # family = "ComicMono Nerd Font"
 # family = "Source Code Pro"
-# family = "iA Writer Mono V"
+#family = "iA Writer Mono V"
 # family = "DejaVu Sans Mono"
 # family = "Anonymous Pro"
 
@@ -16,14 +18,14 @@ family = "Monaco Nerd Font"
 decorations = "buttonless"
 # blur = true
 # opacity = 0.79
-opacity = 0.982
+opacity = 0.7
 # opacity = 0.93
 # option_as_alt = "Both" # breaks "polish" signs
 # startup_mode = "Maximized"
 
 [window.padding]
 x = 6
-y = 4
+y = 0
 
 [window.position]
 x = 0

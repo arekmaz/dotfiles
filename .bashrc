@@ -24,6 +24,8 @@ export HISTFILE=~/.bash_eternal_history
 
 export PATH=/opt/homebrew/bin:/usr/local/bin:/System/Cryptexes/App/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin:/var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin
 
+export PATH="$PATH:/opt/uemacs/bin"
+export PATH="$PATH:/opt"
 
 export PATH="$PATH:/opt/homebrew/opt/libpq/bin"
 # Enable the subsequent settings only in interactive sessions
@@ -138,3 +140,4 @@ function duck!() {
 # perl -pe 's/_([a-z])/\U$1/g' # snake-to-camel-case
 # perl -pe 's/ /\n/g' # spaces to newlines
 # git shortlog --summary -n # gcount
+# ls -1 | sed -e 's/.*/"&"/' | shuf | xargs -n1 less # shuffle read through files in current dir

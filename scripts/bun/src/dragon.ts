@@ -563,14 +563,14 @@ const healer = Effect.fn("healer")(function* (): any {
     h: healFull.pipe(
       Effect.tap(
         ({ cost, restoredHealth }) =>
-          display`Restored ${restoredHealth}, ${cost} gold paid`,
+          display`Restored ${restoredHealth} health, ${cost} gold paid`,
       ),
       Effect.zipRight(healer()),
     ),
     a: healSpecified.pipe(
       Effect.tap(
         ({ cost, restoredHealth }) =>
-          display`Restored ${restoredHealth}, ${cost} gold paid`,
+          display`Restored ${restoredHealth} health, ${cost} gold paid`,
       ),
       Effect.zipRight(healer()),
     ),

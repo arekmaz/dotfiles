@@ -33,7 +33,15 @@ end
 
 vim.opt.rtp:prepend(lazypath)
 
-local themePlugin = {
+local themePlugin =
+--{
+--  "shaunsingh/nord.nvim",
+--  config = function()
+--    vim.cmd("colorscheme nord")
+--  end,
+--}
+
+{
   "zenbones-theme/zenbones.nvim",
   config = function()
     vim.g.zenbones = { transparent_background = true }
@@ -68,4 +76,27 @@ require("lazy").setup({
       { "hrsh7th/cmp-nvim-lua" }, },
     },
   "djoshea/vim-autoread",
+   {
+    'nvim-telescope/telescope.nvim', tag = '0.1.8',
+    dependencies = { 'nvim-lua/plenary.nvim' },
+    config = function () 
+      local builtin = require('telescope.builtin')
+      vim.keymap.set('n', '<leader><leader>', builtin.find_files, { desc = 'Telescope find files' })
+      vim.keymap.set('n', '<leader>/', builtin.live_grep, { desc = 'Telescope live grep' })
+      vim.keymap.set('n', '<leader>h', builtin.command_history, { desc = 'Telescope command history' })
+      vim.keymap.set('n', '<leader>r', builtin.lsp_references, { desc = 'Telescope lsp references' })
+      vim.keymap.set('n', '<leader>*', builtin.grep_string, { desc = 'Telescope find under cursor' })
+    end
+    }
 })
+
+vim.keymap.set("n", "<space>c", function()
+  vim.ui.input({}, function(c)
+    if c and c~=""
+      then 
+        vim.cmd("noswapfile enew") -- vnew, hnew, new
+        vim.bo.buftype = "nofile" vim.bo.bufhidden = "wipe"
+        vim.api.nvim_buf_set_lines(0, 0, -1, false, vim.fn.systemlist(c))
+      end
+  end)
+end)

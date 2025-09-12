@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Ensure SB_INBOX is set
+if [[ -z "${SB_INBOX:-}" ]]; then
+  echo "Error: SB_INBOX environment variable is not set." >&2
+  exit 1
+fi
+
+# Get today's date in YYYY-MM-DD format
+today=$(date +"%Y-%m-%d")
+
+# Construct the full path
+note_path="$SB_INBOX/$today.md"
+
+# Output the path
+echo "$note_path"
+

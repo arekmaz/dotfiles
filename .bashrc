@@ -141,3 +141,4 @@ function duck!() {
 # perl -pe 's/ /\n/g' # spaces to newlines
 # git shortlog --summary -n # gcount
 # ls -1 | sed -e 's/.*/"&"/' | shuf | xargs -n1 less # shuffle read through files in current dir
+# git checkout $(git branch -av --sort=-committerdate | fzf) # branches sorted by most recent changed
